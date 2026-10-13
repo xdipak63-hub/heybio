@@ -1,4 +1,3 @@
-
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "heybio",
@@ -10,5 +9,13 @@
   "workers_dev": true,
   "observability": {
     "enabled": true
+  },
+  "triggers": {
+    "crons": [
+      "*/5 * * * *"
+    ]
+  },
+  "vars": {
+    "BILLING_JOBS_ENABLED": "false"
   }
 }

@@ -1,45 +1,72 @@
+const DEFAULT_REDIRECT = "/dashboard";
 
-export function normalizeExternalUrl(
-  input: string
-): string | null {
+const FORBIDDEN_CHARACTERS =
+  /[\u0000-\u001F\u007F\\]/;
+
+export function safeRedirect(
+  input: unknown,
+  fallback = DEFAULT_REDIRECT
+): string {
+  if (typeof input !== "string") {
+    return fallback;
+  }
+
   const value = input.trim();
 
-  if (!value || value.length > 2048) {
-    return null;
+  if (
+    !value ||
+    value.length > 2048 ||
+    FORBIDDEN_CHARACTERS.test(value)
+  ) {
+    return fallback;
+  }
+
+  if (
+    !value.startsWith("/") ||
+    value.startsWith("//")
+  ) {
+    return fallback;
   }
 
   try {
-    const url = new URL(value);
+    const parsed = new URL(
+      value,
+      "https://heybio.invalid"
+    );
 
     if (
-      url.protocol !== "https:" &&
-      url.protocol !== "http:"
+      parsed.origin !==
+      "https://heybio.invalid"
     ) {
-      return null;
+      return fallback;
     }
 
     if (
-      !url.hostname ||
-      url.username ||
-      url.password
+      parsed.pathname.startsWith(
+        "/api/"
+      ) ||
+      parsed.pathname === "/logout"
     ) {
-      return null;
+      return fallback;
     }
 
-    if (
-      /[\u0000-\u001f\u007f\s]/u.test(value)
-    ) {
-      return null;
-    }
-
-    return url.href;
+    return (
+      parsed.pathname +
+      parsed.search +
+      parsed.hash
+    );
   } catch {
-    return null;
+    return fallback;
   }
 }
 
-export function safePublicUsername(
-  value: string
-): boolean {
-  return /^[a-z][a-z0-9_]{2,29}$/.test(value);
+export function getSafeRedirectFromRequest(
+  request: Request,
+  parameter = "redirectTo"
+): string {
+  const url = new URL(request.url);
+
+  return safeRedirect(
+    url.searchParams.get(parameter)
+  );
 }
