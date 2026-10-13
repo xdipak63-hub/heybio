@@ -3530,3 +3530,18 @@ a.button:hover {
     padding: 12px;
   }
 }
+html {
+  background: #fafaf7;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #fafaf7;
+  color: #181a18;
+  font-family: Inter, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}

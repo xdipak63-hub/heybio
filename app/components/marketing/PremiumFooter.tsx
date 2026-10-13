@@ -1,51 +1,84 @@
-
 import {
   ArrowRight,
   ArrowUpRight,
   Instagram,
-  Mail
+  Mail,
 } from "lucide-react";
 
 type FooterLink = {
   label: string;
   href?: string;
+  external?: boolean;
 };
 
 type FooterGroup = {
   title: string;
-  links: FooterLink[];
+  links: readonly FooterLink[];
 };
 
-const footerGroups: FooterGroup[] = [
+const SUPPORT_EMAIL = "dipolabs123@gmail.com";
+
+const INSTAGRAM_URL =
+  "https://www.instagram.com/haybio.in/";
+
+const footerGroups: readonly FooterGroup[] = [
   {
     title: "Product",
     links: [
-      { label: "Features", href: "/#features" },
-      { label: "Explore", href: "/#explore" },
-      { label: "Templates", href: "/#templates" },
-      { label: "Pricing", href: "/#pricing" },
-      { label: "What's New" }
-    ]
+      { label: "Features", href: "/features" },
+      { label: "Explore", href: "/explore" },
+      { label: "Templates", href: "/templates" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "What's New", href: "/whats-new" },
+    ],
   },
   {
     title: "Company",
     links: [
-      { label: "About HEYBIO", href: "/#about" },
-      { label: "About DIPO LABS", href: "/#about" },
-      { label: "Our Story" },
-      { label: "Latest News" },
-      { label: "Contact" }
-    ]
+      {
+        label: "About HEYBIO",
+        href: "/about-heybio",
+      },
+      {
+        label: "About DIPO LABS",
+        href: "/about-dipolabs",
+      },
+      {
+        label: "Our Story",
+        href: "/our-story",
+      },
+      {
+        label: "Latest News",
+        href: "/news",
+      },
+      {
+        label: "Contact",
+        href: "/contact",
+      },
+    ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Help Center" },
-      { label: "Getting Started", href: "/#how-it-works" },
-      { label: "FAQs", href: "/#faq" },
-      { label: "Support" },
-      { label: "Report a Problem" }
-    ]
+      {
+        label: "Getting Started",
+        href: "/features",
+      },
+      {
+        label: "FAQs",
+        href: "/#faq",
+      },
+      {
+        label: "Support",
+        href: "/contact",
+      },
+      {
+        label: "Report a Problem",
+        href:
+          `mailto:${SUPPORT_EMAIL}` +
+          "?subject=HEYBIO%20Problem%20Report",
+      },
+    ],
   },
   {
     title: "Legal",
@@ -53,13 +86,13 @@ const footerGroups: FooterGroup[] = [
       { label: "Terms of Service" },
       { label: "Privacy Policy" },
       { label: "Cookie Policy" },
-      { label: "Community Guidelines" }
-    ]
-  }
+      { label: "Community Guidelines" },
+    ],
+  },
 ];
 
 function FooterColumn({
-  group
+  group,
 }: {
   group: FooterGroup;
 }) {
@@ -71,16 +104,24 @@ function FooterColumn({
         {group.links.map((link) => (
           <li key={link.label}>
             {link.href ? (
-              <a href={link.href}>{link.label}</a>
+              <a
+                href={link.href}
+                {...(link.external
+                  ? {
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                    }
+                  : {})}
+              >
+                {link.label}
+              </a>
             ) : (
               <span
                 className="footer-link--pending"
-                title="This page is being prepared"
+                title="This page is not yet published"
+                aria-label={`${link.label}, not yet published`}
               >
                 {link.label}
-                <span className="sr-only">
-                  {" "}— coming soon
-                </span>
               </span>
             )}
           </li>
@@ -108,7 +149,7 @@ export default function PremiumFooter() {
           </div>
 
           <a
-            href="/#pricing"
+            href="/pricing"
             className="footer-intro__action"
           >
             Explore plans
@@ -140,29 +181,37 @@ export default function PremiumFooter() {
             </p>
 
             <p className="footer-brand__description">
-              A better way to express yourself,
-              share your work and connect your world.
+              A more expressive way to share
+              your work, your content and your world.
             </p>
 
             <div className="footer-social">
               <span>Follow us</span>
 
               <div className="footer-social__links">
-                <span
-                  className="footer-social__placeholder"
-                  title="Official social account coming soon"
-                  aria-label="Instagram account coming soon"
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="HEYBIO on Instagram"
+                  title="Instagram @haybio.in"
                 >
-                  <Instagram size={18} />
-                </span>
+                  <Instagram
+                    size={18}
+                    aria-hidden="true"
+                  />
+                </a>
 
-                <span
-                  className="footer-social__placeholder"
-                  title="Official contact channel coming soon"
-                  aria-label="Email contact coming soon"
+                <a
+                  href={`mailto:${SUPPORT_EMAIL}`}
+                  aria-label="Email HEYBIO"
+                  title={SUPPORT_EMAIL}
                 >
-                  <Mail size={18} />
-                </span>
+                  <Mail
+                    size={18}
+                    aria-hidden="true"
+                  />
+                </a>
               </div>
             </div>
           </div>
@@ -180,16 +229,31 @@ export default function PremiumFooter() {
         <div className="footer-statement">
           <span>CREATED TO CONNECT.</span>
           <span>BUILT TO EXPRESS.</span>
-          <ArrowRight size={20} aria-hidden="true" />
+          <ArrowRight
+            size={20}
+            aria-hidden="true"
+          />
         </div>
 
         <div className="footer-bottom">
-          <p>© 2026 DIPO LABS. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} DIPO LABS.
+            All rights reserved.
+          </p>
 
-          <p>HEYBIO is a product of DIPO LABS.</p>
+          <p>
+            HEYBIO is a product of DIPO LABS.
+          </p>
 
-          <a href="/" aria-label="Back to HEYBIO homepage">
-            HEYBIO <ArrowUpRight size={14} aria-hidden="true" />
+          <a
+            href="/"
+            aria-label="Back to HEYBIO homepage"
+          >
+            HEYBIO
+            <ArrowUpRight
+              size={14}
+              aria-hidden="true"
+            />
           </a>
         </div>
       </div>

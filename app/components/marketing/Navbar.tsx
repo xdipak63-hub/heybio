@@ -1,121 +1,109 @@
-
 import { useState } from "react";
 import {
-  ArrowRight,
   ArrowUpRight,
   Menu,
-  X
+  X,
 } from "lucide-react";
 
-type NavigationItem = {
-  label: string;
-  href: string;
-};
-
-const navigation: NavigationItem[] = [
+const links = [
   { label: "Features", href: "/#features" },
-  { label: "Explore", href: "/#explore" },
-  { label: "Templates", href: "/#templates" },
-  { label: "Pricing", href: "/#pricing" },
-  { label: "HYPE DROP", href: "/#hype-drop" }
+  { label: "How it works", href: "/#how-it-works" },
+  { label: "HYPE DROP", href: "/#hype-drop" },
+  { label: "Pricing", href: "/pricing" },
 ];
 
 export default function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  function closeMenu() {
-    setMenuOpen(false);
-  }
+  const [open, setOpen] = useState(false);
 
   return (
-    <header className="site-header">
-      <div className="site-header__inner container">
+    <header className="hb-header">
+      <div className="hb-header__inner">
         <a
-          className="brand"
           href="/"
+          className="hb-header__logo"
           aria-label="HEYBIO homepage"
-          onClick={closeMenu}
         >
-          HEYBIO
-          <span className="brand-arrow" aria-hidden="true">
-            ↗
-          </span>
+          HEYBIO<span>↗</span>
         </a>
 
         <nav
-          className="desktop-navigation"
+          className="hb-header__desktop"
           aria-label="Primary navigation"
         >
-          {navigation.map((item) => (
-            <a href={item.href} key={item.label}>
-              {item.label}
+          {links.map((link) => (
+            <a key={link.href} href={link.href}>
+              {link.label}
             </a>
           ))}
         </nav>
 
-        <div className="site-header__actions">
+        <div className="hb-header__actions">
           <a
-            href="/#pricing"
-            className="button button--nav"
+            href="/login"
+            className="hb-header__login"
           >
-            Get started
-            <ArrowUpRight size={16} aria-hidden="true" />
+            Log in
+          </a>
+
+          <a
+            href="/#claim-username"
+            className="hb-header__create"
+          >
+            Create yours
+            <ArrowUpRight size={17} />
           </a>
 
           <button
             type="button"
-            className="mobile-menu-toggle"
-            aria-label={
-              menuOpen ? "Close navigation" : "Open navigation"
-            }
-            aria-expanded={menuOpen}
-            aria-controls="mobile-navigation"
-            onClick={() => setMenuOpen((open) => !open)}
+            className="hb-header__menu"
+            onClick={() => setOpen((value) => !value)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="hb-mobile-nav"
           >
-            {menuOpen ? <X size={23} /> : <Menu size={23} />}
+            {open ? <X size={23} /> : <Menu size={23} />}
           </button>
         </div>
       </div>
 
       <nav
-        id="mobile-navigation"
-        className={`mobile-navigation ${
-          menuOpen ? "mobile-navigation--open" : ""
-        }`}
+        id="hb-mobile-nav"
+        className={
+          open
+            ? "hb-header__mobile hb-header__mobile--open"
+            : "hb-header__mobile"
+        }
         aria-label="Mobile navigation"
-        hidden={!menuOpen}
+        hidden={!open}
       >
-        <div className="mobile-navigation__links">
-          {navigation.map((item, index) => (
-            <a
-              href={item.href}
-              key={item.label}
-              onClick={closeMenu}
-            >
-              <span className="mobile-navigation__number">
-                0{index + 1}
-              </span>
-              <span>{item.label}</span>
-              <ArrowUpRight
-                size={20}
-                aria-hidden="true"
-              />
-            </a>
-          ))}
-        </div>
+        {links.map((link, index) => (
+          <a
+            key={link.href}
+            href={link.href}
+            onClick={() => setOpen(false)}
+          >
+            <span>0{index + 1}</span>
+            {link.label}
+            <ArrowUpRight size={20} />
+          </a>
+        ))}
 
         <a
-          href="/#pricing"
-          className="button button--lime mobile-navigation__cta"
-          onClick={closeMenu}
+          href="/login"
+          onClick={() => setOpen(false)}
         >
-          Discover your plan
-          <ArrowRight size={18} aria-hidden="true" />
+          <span>05</span>
+          Log in
+          <ArrowUpRight size={20} />
         </a>
 
-        <span className="mobile-navigation__footer">
-          Your world. One link.
-        </span>
+        <a
+          className="hb-header__mobile-cta"
+          href="/#claim-username"
+          onClick={() => setOpen(false)}
+        >
+          Create your HEYBIO ↗
+        </a>
       </nav>
     </header>
   );

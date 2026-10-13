@@ -1,23 +1,32 @@
+import { useEffect, useState } from "react";
+
 import {
   Form,
   data,
   redirect,
   useActionData,
   useLoaderData,
-  useNavigation
+  useNavigation,
 } from "react-router";
 
 import type {
   ActionFunctionArgs,
-  LoaderFunctionArgs
+  LoaderFunctionArgs,
 } from "react-router";
 
 import {
-  requireUser
+  ArrowUpRight,
+  AtSign,
+  Check,
+  Sparkles,
+} from "lucide-react";
+
+import {
+  requireUser,
 } from "../../lib/auth/require-user.server";
 
 import {
-  requireSameOrigin
+  requireSameOrigin,
 } from "../../lib/supabase/server";
 
 const USERNAME_REGEX =
@@ -29,44 +38,44 @@ const RESERVED = new Set([
   "api",
   "auth",
   "billing",
+  "callback",
+  "contact",
   "dashboard",
   "dipolabs",
+  "explore",
+  "features",
+  "forgot-password",
   "heybio",
   "help",
   "hypedrop",
   "login",
   "logout",
-  "me",
+  "news",
+  "onboarding",
   "pricing",
   "privacy",
-  "root",
+  "reset-password",
   "settings",
   "signup",
   "support",
-  "system",
-  "www"
+  "templates",
+  "verify-email",
+  "www",
 ]);
-
-function isValidUsername(username: string) {
-  return (
-    USERNAME_REGEX.test(username) &&
-    !RESERVED.has(username)
-  );
-}
 
 export function meta() {
   return [
-    { title: "Choose username — HEYBIO" },
+    { title: "Claim your username — HEYBIO" },
     {
       name: "robots",
-      content: "noindex, nofollow"
-    }
+      content: "noindex, nofollow",
+    },
   ];
 }
 
 export async function loader({
   request,
-  context
+  context,
 }: LoaderFunctionArgs) {
   const { user, client } =
     await requireUser(request, context);
@@ -80,32 +89,32 @@ export async function loader({
 
   if (error) {
     throw new Response(
-      "Could not load your profile.",
+      "Unable to load your profile.",
       {
         status: 503,
-        headers: client.headers
-      }
+        headers: client.headers,
+      },
     );
   }
 
   if (profile?.username) {
-    throw redirect("/dashboard", {
-      headers: client.headers
+    throw redirect("/onboarding/choose-plan", {
+      headers: client.headers,
     });
   }
 
   return data(
     {
       displayName:
-        profile?.display_name || "Creator"
+        profile?.display_name ?? "Creator",
     },
-    { headers: client.headers }
+    { headers: client.headers },
   );
 }
 
 export async function action({
   request,
-  context
+  context,
 }: ActionFunctionArgs) {
   requireSameOrigin(request);
 
@@ -115,19 +124,24 @@ export async function action({
   const form = await request.formData();
 
   const username = String(
-    form.get("username") ?? ""
-  ).trim().toLowerCase();
+    form.get("username") ?? "",
+  )
+    .trim()
+    .toLowerCase();
 
-  if (!isValidUsername(username)) {
+  if (
+    !USERNAME_REGEX.test(username) ||
+    RESERVED.has(username)
+  ) {
     return data(
       {
         error:
-          "Use 3–30 characters. Start with a letter; use only lowercase letters, numbers or underscores. Reserved names aren't allowed."
+          "Use 3–30 characters, starting with a letter. Only lowercase letters, numbers and underscores are allowed.",
       },
       {
         status: 400,
-        headers: client.headers
-      }
+        headers: client.headers,
+      },
     );
   }
 
@@ -143,44 +157,45 @@ export async function action({
       { error: "Please try again." },
       {
         status: 503,
-        headers: client.headers
-      }
+        headers: client.headers,
+      },
     );
   }
 
   if (existing?.username) {
-    throw redirect("/dashboard", {
-      headers: client.headers
+    throw redirect("/onboarding/choose-plan", {
+      headers: client.headers,
     });
   }
 
-  const { error } = await client.supabase
-    .from("profiles")
-    .upsert(
-      {
-        id: user.id,
-        username
-      },
-      { onConflict: "id" }
-    );
+  const { error } =
+    await client.supabase
+      .from("profiles")
+      .upsert(
+        {
+          id: user.id,
+          username,
+        },
+        { onConflict: "id" },
+      );
 
   if (error) {
     return data(
       {
         error:
           error.code === "23505"
-            ? "That username is already taken."
-            : "Unable to save username. Try another one."
+            ? "This username has already been claimed."
+            : "Unable to claim this username. Please try again.",
       },
       {
         status: 409,
-        headers: client.headers
-      }
+        headers: client.headers,
+      },
     );
   }
 
-  throw redirect("/dashboard", {
-    headers: client.headers
+  throw redirect("/onboarding/choose-plan", {
+    headers: client.headers,
   });
 }
 
@@ -188,35 +203,58 @@ export default function ChooseUsernamePage() {
   const { displayName } =
     useLoaderData<typeof loader>();
 
-  const actionData = useActionData<typeof action>();
+  const actionData =
+    useActionData<typeof action>();
+
   const navigation = useNavigation();
+
+  const [username, setUsername] = useState("");
 
   const submitting =
     navigation.state === "submitting";
 
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(
+        "heybio:desired-username",
+      );
+
+      if (
+        saved &&
+        USERNAME_REGEX.test(saved) &&
+        !RESERVED.has(saved)
+      ) {
+        setUsername(saved);
+      }
+    } catch {
+      // Storage is optional.
+    }
+  }, []);
+
   return (
-    <main className="onboarding-page">
-      <div className="onboarding-card">
-        <a className="brand" href="/">
-          HEYBIO
-          <span className="brand-arrow">↗</span>
+    <main className="hb-onboarding">
+      <div className="hb-onboarding__card">
+        <a href="/" className="hb-header__logo">
+          HEYBIO<span>↗</span>
         </a>
 
-        <div className="onboarding-card__progress">
-          <span>STEP 01 / YOUR IDENTITY</span>
-          <div>
-            <span />
-          </div>
+        <div className="hb-onboarding__progress">
+          <span>YOUR CREATOR JOURNEY</span>
+          <span>01 / 02</span>
         </div>
 
-        <span className="eyebrow">
-          MAKE IT YOURS
+        <div className="hb-onboarding__icon">
+          <AtSign size={34} />
+        </div>
+
+        <span className="hb-eyebrow">
+          YOUR INTERNET IDENTITY
         </span>
 
         <h1>
           Hello, {displayName}.
           <br />
-          Claim your link.
+          <span>Claim your space.</span>
         </h1>
 
         <p>
@@ -224,54 +262,63 @@ export default function ChooseUsernamePage() {
           when they visit your HEYBIO.
         </p>
 
-        <Form method="post" className="auth-form">
+        <Form method="post" className="hb-onboarding__form">
           {actionData?.error && (
-            <div
-              className="auth-error"
-              role="alert"
-            >
+            <div className="hb-onboarding__error" role="alert">
               {actionData.error}
             </div>
           )}
 
           <label htmlFor="username">
-            Your username
+            Your HEYBIO username
           </label>
 
-          <div className="username-field">
-            <span>@</span>
+          <div className="hb-onboarding__field">
+            <span>heybio.in/</span>
 
             <input
               id="username"
               name="username"
-              type="text"
+              value={username}
+              onChange={(event) =>
+                setUsername(
+                  event.target.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9_]/g, "")
+                    .slice(0, 30),
+                )
+              }
+              placeholder="yourname"
               autoComplete="off"
               autoCapitalize="none"
               spellCheck={false}
-              pattern="[a-z][a-z0-9_]{2,29}"
-              title="3–30 characters, starting with a lowercase letter"
               minLength={3}
               maxLength={30}
-              placeholder="yourname"
               required
             />
           </div>
 
-          <p className="field-help">
-            Lowercase letters, numbers and underscores.
-            3–30 characters.
-          </p>
+          <small>
+            <Check size={14} />
+            3–30 characters. Start with a letter.
+          </small>
 
           <button
             type="submit"
             disabled={submitting}
-            className="button button--dark auth-submit"
           >
             {submitting
-              ? "Saving..."
-              : "Claim username ↗"}
+              ? "Claiming your username..."
+              : "Claim username"}
+            <ArrowUpRight size={20} />
           </button>
         </Form>
+
+        <div className="hb-onboarding__tip">
+          <Sparkles size={18} />
+          Small beginnings can lead to
+          wonderful things.
+        </div>
       </div>
     </main>
   );
