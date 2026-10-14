@@ -1,3 +1,4 @@
+
 import {
   type RouteConfig,
   index,
@@ -8,8 +9,7 @@ import "./styles/app.css";
 import "./styles/heybio-premium.css";
 
 export default [
-  // PUBLIC MARKETING
-
+  // Marketing
   index("routes/marketing/home.tsx"),
 
   route(
@@ -17,8 +17,7 @@ export default [
     "routes/marketing/pricing.tsx",
   ),
 
-  // AUTHENTICATION
-
+  // Authentication
   route(
     "signup",
     "routes/auth/signup.tsx",
@@ -54,8 +53,18 @@ export default [
     "routes/auth/verify-email.tsx",
   ),
 
-  // CREATOR ONBOARDING
+  // MFA
+  route(
+    "auth/mfa-setup",
+    "routes/auth/mfa-setup.tsx",
+  ),
 
+  route(
+    "auth/mfa-verify",
+    "routes/auth/mfa-verify.tsx",
+  ),
+
+  // Creator onboarding
   route(
     "onboarding/choose-username",
     "routes/onboarding/choose-username.tsx",
@@ -66,8 +75,22 @@ export default [
     "routes/onboarding/choose-plan.tsx",
   ),
 
-  // CREATOR DASHBOARD
+  route(
+    "onboarding/create-profile",
+    "routes/onboarding/create-profile.tsx",
+  ),
 
+  route(
+    "onboarding/choose-template",
+    "routes/onboarding/choose-template.tsx",
+  ),
+
+  route(
+    "onboarding/complete",
+    "routes/onboarding/complete.tsx",
+  ),
+
+  // Creator dashboard
   route(
     "dashboard",
     "routes/dashboard/overview.tsx",
@@ -83,14 +106,11 @@ export default [
     "routes/dashboard/appearance.tsx",
   ),
 
-  // PUBLIC USERNAME AVAILABILITY
-
+  // API
   route(
     "api/username-availability",
     "routes/api/username-availability.ts",
   ),
-
-  // BILLING
 
   route(
     "api/checkout",
@@ -107,23 +127,17 @@ export default [
     "routes/api/razorpay-webhook.ts",
   ),
 
-  // HYPE DROP ENTITLEMENTS
-
   route(
     "api/hype-entitlement",
     "routes/api/hype-entitlement.ts",
   ),
-
-  // SUPER ADMIN
 
   route(
     "api/admin-actions",
     "routes/api/admin-actions.ts",
   ),
 
-  // PUBLIC CREATOR PROFILE
-  // Keep this route last.
-
+  // Public creator profile — must remain last
   route(
     ":username",
     "routes/public/profile.tsx",
