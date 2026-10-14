@@ -1,0 +1,236 @@
+
+/* HEYBIO Public Creator Experience */
+
+.hb-public-page,
+.hb-public-missing {
+  min-height: 100dvh;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.hb-public-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.hb-public-page__header {
+  width: 100%;
+  min-height: 76px;
+  padding: 16px clamp(20px, 5vw, 64px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.hb-public-page__brand,
+.hb-public-missing__header a {
+  color: #1d1d1f;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.06em;
+}
+
+.hb-public-page__brand span,
+.hb-public-missing__header span {
+  color: #719700;
+}
+
+.hb-public-page__share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 16px;
+  background: #fff;
+  color: #1d1d1f;
+  border: 1px solid #e2e2e6;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.hb-public-page__share:hover {
+  background: #ebebee;
+}
+
+.hb-public-page__share:active {
+  transform: scale(.97);
+}
+
+.hb-public-page__content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 18px 16px 70px;
+}
+
+.hb-public-page__content > * {
+  width: min(100%, 560px);
+}
+
+.hb-public-page__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px clamp(20px, 5vw, 64px);
+  border-top: 1px solid #e6e6e9;
+  color: #74747a;
+  font-size: 12px;
+}
+
+.hb-public-page__footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #1d1d1f;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.hb-public-missing {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.hb-public-missing__header {
+  padding: 26px clamp(20px, 5vw, 64px);
+}
+
+.hb-public-missing__body {
+  flex: 1;
+  width: min(100%, 660px);
+  margin: auto;
+  padding: 70px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hb-public-missing__icon {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: #f5f5f7;
+  margin-bottom: 30px;
+}
+
+.hb-public-missing__eyebrow {
+  color: #737378;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .14em;
+}
+
+.hb-public-missing__body h1 {
+  margin: 18px 0 16px;
+  font-size: clamp(36px, 7vw, 62px);
+  line-height: 1.08;
+  letter-spacing: -.065em;
+  font-weight: 750;
+}
+
+.hb-public-missing__body p {
+  max-width: 460px;
+  margin: 0;
+  color: #68686d;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.hb-public-missing__actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.hb-public-missing__primary,
+.hb-public-missing__secondary {
+  min-height: 48px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hb-public-missing__primary {
+  background: #bdf806;
+  color: #1d1d1f;
+  border: 1px solid #bdf806;
+}
+
+.hb-public-missing__secondary {
+  background: #f5f5f7;
+  color: #1d1d1f;
+  border: 1px solid #e6e6e9;
+}
+
+.hb-public-missing__footer {
+  padding: 24px;
+  text-align: center;
+  color: #77777c;
+  font-size: 12px;
+}
+
+.hb-public-page a:focus-visible,
+.hb-public-page button:focus-visible,
+.hb-public-missing a:focus-visible,
+.hb-public-missing button:focus-visible {
+  outline: 3px solid #739900;
+  outline-offset: 4px;
+}
+
+@media (max-width: 600px) {
+  .hb-public-page__header {
+    min-height: 68px;
+  }
+
+  .hb-public-page__content {
+    padding: 10px 12px 48px;
+  }
+
+  .hb-public-page__footer {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .hb-public-missing__body {
+    padding: 60px 22px;
+  }
+
+  .hb-public-missing__body h1 {
+    font-size: clamp(34px, 10vw, 48px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-public-page__share {
+    transition: none;
+  }
+
+  .hb-public-page__share:active {
+    transform: none;
+  }
+}

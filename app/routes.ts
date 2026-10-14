@@ -5,12 +5,12 @@ import {
   route,
 } from "@react-router/dev/routes";
 
-import "./styles/app.css";
-import "./styles/heybio-premium.css";
-
+import "./styles/creator-components.css";
+import "./styles/ui-system.css";
 export default [
   // Marketing
   index("routes/marketing/home.tsx"),
+
 
   route(
     "pricing",
@@ -106,7 +106,30 @@ export default [
     "routes/dashboard/appearance.tsx",
   ),
 
+
+  // Protected administration
+  route(
+    "admin",
+    "routes/admin/layout.tsx",
+    [
+      index("routes/admin/overview.tsx")
+    ]
+  ),
+
   // API
+
+
+  // API
+ 
+ route(
+  "api/social-links",
+  "routes/api/social-links.ts",
+),
+
+route(
+  "api/uploads",
+  "routes/api/uploads.ts",
+),
   route(
     "api/username-availability",
     "routes/api/username-availability.ts",

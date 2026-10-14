@@ -1,11 +1,13 @@
+
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import {
   ArrowUpRight,
   Check,
   LoaderCircle,
   Sparkles,
 } from "lucide-react";
+
+import { openHeybioIntro } from "./IntroExperience";
 
 const USERNAME_PATTERN = /^[a-z][a-z0-9_]{2,29}$/;
 
@@ -46,29 +48,28 @@ type AvailabilityResponse = {
 };
 
 export default function UsernameClaim() {
-  const navigate = useNavigate();
-
   const [username, setUsername] = useState("");
   const [availability, setAvailability] =
     useState<AvailabilityResponse | null>(null);
   const [checking, setChecking] = useState(false);
 
   const normalized = username.trim().toLowerCase();
+
   const valid =
     USERNAME_PATTERN.test(normalized) &&
     !RESERVED.has(normalized);
 
   useEffect(() => {
     setAvailability(null);
+    setChecking(false);
 
-    if (!valid) {
-      setChecking(false);
-      return;
-    }
+    if (!valid) return;
 
     const controller = new AbortController();
+    let active = true;
 
     const timeout = window.setTimeout(async () => {
+      if (!active) return;
       setChecking(true);
 
       try {
@@ -78,9 +79,7 @@ export default function UsernameClaim() {
           )}`,
           {
             signal: controller.signal,
-            headers: {
-              Accept: "application/json",
-            },
+            headers: { Accept: "application/json" },
           },
         );
 
@@ -88,10 +87,12 @@ export default function UsernameClaim() {
           throw new Error("Availability check failed");
         }
 
-        const result =
-          (await response.json()) as AvailabilityResponse;
+        const data: AvailabilityResponse =
+          await response.json();
 
-        setAvailability(result);
+        if (active) {
+          setAvailability(data);
+        }
       } catch (error) {
         if (
           error instanceof Error &&
@@ -100,29 +101,33 @@ export default function UsernameClaim() {
           return;
         }
 
-        setAvailability({
-          available: false,
-          message: "Unable to check right now. Try again.",
-        });
+        if (active) {
+          setAvailability({
+            available: false,
+            message: "Unable to check right now. Try again.",
+          });
+        }
       } finally {
-        if (!controller.signal.aborted) {
+        if (active) {
           setChecking(false);
         }
       }
     }, 400);
 
     return () => {
+      active = false;
       window.clearTimeout(timeout);
       controller.abort();
     };
   }, [normalized, valid]);
 
+  const canClaim =
+    valid && availability?.available === true && !checking;
+
   function claim(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!valid || !availability?.available || checking) {
-      return;
-    }
+    if (!canClaim) return;
 
     try {
       sessionStorage.setItem(
@@ -130,24 +135,15 @@ export default function UsernameClaim() {
         normalized,
       );
     } catch {
-      // Username can also be entered during onboarding.
+      // URL fallback is handled by the intro.
     }
 
-    navigate(
-      `/signup?username=${encodeURIComponent(normalized)}`,
-    );
+    openHeybioIntro(normalized);
   }
 
   return (
-    <form
-      className="hb-claim"
-      onSubmit={claim}
-      noValidate
-    >
-      <label
-        htmlFor="hb-username"
-        className="hb-claim__label"
-      >
+    <form className="hb-claim" onSubmit={claim} noValidate>
+      <label htmlFor="hb-username" className="hb-claim__label">
         <Sparkles size={16} />
         YOUR INTERNET ADDRESS STARTS HERE
       </label>
@@ -183,9 +179,9 @@ export default function UsernameClaim() {
           <LoaderCircle
             className="hb-spin"
             size={20}
-            aria-label="Checking"
+            aria-label="Checking availability"
           />
-        ) : availability?.available ? (
+        ) : canClaim ? (
           <Check size={20} color="#418500" />
         ) : null}
       </div>
@@ -206,10 +202,10 @@ export default function UsernameClaim() {
       <button
         type="submit"
         className="hb-claim__button"
-        disabled={!availability?.available || checking}
+        disabled={!canClaim}
       >
         Claim my HEYBIO
-        <ArrowUpRight size={23} />
+        <ArrowUpRight size={22} />
       </button>
 
       <p className="hb-claim__fineprint">

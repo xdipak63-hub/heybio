@@ -38,10 +38,25 @@ type Pages = {
   "/verify-email": {
     params: {};
   };
+  "/auth/mfa-setup": {
+    params: {};
+  };
+  "/auth/mfa-verify": {
+    params: {};
+  };
   "/onboarding/choose-username": {
     params: {};
   };
   "/onboarding/choose-plan": {
+    params: {};
+  };
+  "/onboarding/create-profile": {
+    params: {};
+  };
+  "/onboarding/choose-template": {
+    params: {};
+  };
+  "/onboarding/complete": {
     params: {};
   };
   "/dashboard": {
@@ -51,6 +66,15 @@ type Pages = {
     params: {};
   };
   "/dashboard/appearance": {
+    params: {};
+  };
+  "/admin": {
+    params: {};
+  };
+  "/api/social-links": {
+    params: {};
+  };
+  "/api/uploads": {
     params: {};
   };
   "/api/username-availability": {
@@ -81,7 +105,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/pricing" | "/signup" | "/login" | "/auth/callback" | "/logout" | "/forgot-password" | "/reset-password" | "/verify-email" | "/onboarding/choose-username" | "/onboarding/choose-plan" | "/dashboard" | "/dashboard/links" | "/dashboard/appearance" | "/api/username-availability" | "/api/checkout" | "/api/subscription-cancel" | "/api/razorpay-webhook" | "/api/hype-entitlement" | "/api/admin-actions" | "/:username";
+    page: "/" | "/pricing" | "/signup" | "/login" | "/auth/callback" | "/logout" | "/forgot-password" | "/reset-password" | "/verify-email" | "/auth/mfa-setup" | "/auth/mfa-verify" | "/onboarding/choose-username" | "/onboarding/choose-plan" | "/onboarding/create-profile" | "/onboarding/choose-template" | "/onboarding/complete" | "/dashboard" | "/dashboard/links" | "/dashboard/appearance" | "/admin" | "/api/social-links" | "/api/uploads" | "/api/username-availability" | "/api/checkout" | "/api/subscription-cancel" | "/api/razorpay-webhook" | "/api/hype-entitlement" | "/api/admin-actions" | "/:username";
   };
   "routes/marketing/home.tsx": {
     id: "routes/marketing/home";
@@ -119,6 +143,14 @@ type RouteFiles = {
     id: "routes/auth/verify-email";
     page: "/verify-email";
   };
+  "routes/auth/mfa-setup.tsx": {
+    id: "routes/auth/mfa-setup";
+    page: "/auth/mfa-setup";
+  };
+  "routes/auth/mfa-verify.tsx": {
+    id: "routes/auth/mfa-verify";
+    page: "/auth/mfa-verify";
+  };
   "routes/onboarding/choose-username.tsx": {
     id: "routes/onboarding/choose-username";
     page: "/onboarding/choose-username";
@@ -126,6 +158,18 @@ type RouteFiles = {
   "routes/onboarding/choose-plan.tsx": {
     id: "routes/onboarding/choose-plan";
     page: "/onboarding/choose-plan";
+  };
+  "routes/onboarding/create-profile.tsx": {
+    id: "routes/onboarding/create-profile";
+    page: "/onboarding/create-profile";
+  };
+  "routes/onboarding/choose-template.tsx": {
+    id: "routes/onboarding/choose-template";
+    page: "/onboarding/choose-template";
+  };
+  "routes/onboarding/complete.tsx": {
+    id: "routes/onboarding/complete";
+    page: "/onboarding/complete";
   };
   "routes/dashboard/overview.tsx": {
     id: "routes/dashboard/overview";
@@ -138,6 +182,22 @@ type RouteFiles = {
   "routes/dashboard/appearance.tsx": {
     id: "routes/dashboard/appearance";
     page: "/dashboard/appearance";
+  };
+  "routes/admin/layout.tsx": {
+    id: "routes/admin/layout";
+    page: "/admin";
+  };
+  "routes/admin/overview.tsx": {
+    id: "routes/admin/overview";
+    page: "/admin";
+  };
+  "routes/api/social-links.ts": {
+    id: "routes/api/social-links";
+    page: "/api/social-links";
+  };
+  "routes/api/uploads.ts": {
+    id: "routes/api/uploads";
+    page: "/api/uploads";
   };
   "routes/api/username-availability.ts": {
     id: "routes/api/username-availability";
@@ -180,11 +240,20 @@ type RouteModules = {
   "routes/auth/forgot-password": typeof import("./app/routes/auth/forgot-password.tsx");
   "routes/auth/reset-password": typeof import("./app/routes/auth/reset-password.tsx");
   "routes/auth/verify-email": typeof import("./app/routes/auth/verify-email.tsx");
+  "routes/auth/mfa-setup": typeof import("./app/routes/auth/mfa-setup.tsx");
+  "routes/auth/mfa-verify": typeof import("./app/routes/auth/mfa-verify.tsx");
   "routes/onboarding/choose-username": typeof import("./app/routes/onboarding/choose-username.tsx");
   "routes/onboarding/choose-plan": typeof import("./app/routes/onboarding/choose-plan.tsx");
+  "routes/onboarding/create-profile": typeof import("./app/routes/onboarding/create-profile.tsx");
+  "routes/onboarding/choose-template": typeof import("./app/routes/onboarding/choose-template.tsx");
+  "routes/onboarding/complete": typeof import("./app/routes/onboarding/complete.tsx");
   "routes/dashboard/overview": typeof import("./app/routes/dashboard/overview.tsx");
   "routes/dashboard/links": typeof import("./app/routes/dashboard/links.tsx");
   "routes/dashboard/appearance": typeof import("./app/routes/dashboard/appearance.tsx");
+  "routes/admin/layout": typeof import("./app/routes/admin/layout.tsx");
+  "routes/admin/overview": typeof import("./app/routes/admin/overview.tsx");
+  "routes/api/social-links": typeof import("./app/routes/api/social-links.ts");
+  "routes/api/uploads": typeof import("./app/routes/api/uploads.ts");
   "routes/api/username-availability": typeof import("./app/routes/api/username-availability.ts");
   "routes/api/checkout": typeof import("./app/routes/api/checkout.ts");
   "routes/api/subscription-cancel": typeof import("./app/routes/api/subscription-cancel.ts");
