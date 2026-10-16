@@ -1,94 +1,19 @@
 import type { MetaFunction } from "react-router";
-import { ArrowUpRight, Bell, Sparkles } from "lucide-react";
-
-import Navbar from "../../components/marketing/Navbar";
-import PremiumFooter from "../../components/marketing/PremiumFooter";
+import { ArrowUpRight, Bell, CalendarDays, CheckCircle2, Clock3 } from "lucide-react";
+import { ClosingCTA, EditorialHero, EditorialLayout, Eyebrow } from "../../components/marketing/EditorialLayout";
 
 export const meta: MetaFunction = () => [
-  { title: "What's New — HEYBIO" },
-  {
-    name: "description",
-    content:
-      "Product updates and release information for HEYBIO.",
-  },
+  { title: "What's New — HEYBIO Product Updates" },
+  { name: "description", content: "HEYBIO product release notes and improvements, shared after they are verified and available." },
 ];
 
 export default function WhatsNewPage() {
   return (
-    <>
-      <Navbar />
-
-      <main>
-        <section className="page-hero container">
-          <span className="eyebrow">HEYBIO / WHAT'S NEW</span>
-
-          <h1>
-            Progress worth
-            <br />
-            <span>sharing.</span>
-          </h1>
-
-          <p>
-            A dedicated place for product releases,
-            improvements and feature announcements.
-          </p>
-        </section>
-
-        <section
-          className="container"
-          style={{ paddingBottom: 100 }}
-        >
-          <div className="feature-grid">
-            <article className="feature-card">
-              <Sparkles size={32} aria-hidden="true" />
-
-              <h2>Product updates</h2>
-
-              <p>
-                Release notes will be published here
-                once features are available in the
-                production application.
-              </p>
-            </article>
-
-            <article className="feature-card">
-              <Bell size={32} aria-hidden="true" />
-
-              <h2>Announcements</h2>
-
-              <p>
-                Major product milestones will be shared
-                through HEYBIO's official channels.
-              </p>
-            </article>
-          </div>
-        </section>
-
-        <section
-          className="container"
-          style={{ paddingBottom: 100 }}
-        >
-          <div className="section-heading">
-            <span className="eyebrow">RELEASE HISTORY</span>
-            <h2>No public releases listed yet.</h2>
-            <p>
-              This changelog will only include
-              verified releases. Planned functionality
-              is not presented as already shipped.
-            </p>
-          </div>
-
-          <a
-            href="/news"
-            className="button button--dark"
-          >
-            Visit newsroom
-            <ArrowUpRight size={18} aria-hidden="true" />
-          </a>
-        </section>
-      </main>
-
-      <PremiumFooter />
-    </>
+    <EditorialLayout>
+      <EditorialHero label="HEYBIO / WHAT'S NEW" title={<>A little better.<br /><em>Every thoughtful update.</em></>} description="Follow the evolution of HEYBIO. Verified feature releases, product refinements and important changes will be documented here." />
+      <section className="he-container he-section he-updates" aria-labelledby="he-u-title"><div className="he-updates__head he-reveal"><div><Eyebrow>RELEASE NOTES</Eyebrow><h2 id="he-u-title">A clear record of progress.</h2></div><span className="he-status"><Clock3 size={16} /> Public changelog pending</span></div><article className="he-changelog he-reveal"><div className="he-changelog__rail"><span /></div><div className="he-changelog__content"><span className="he-changelog__eyebrow"><CalendarDays size={17} /> NO VERIFIED PUBLIC RELEASE ENTRIES</span><h3>Official release history will appear here.</h3><p>We'll publish entries only after the related features have shipped and their availability has been confirmed. Development plans aren't listed as completed releases.</p><a className="he-text-link" href="/news">Read official news <ArrowUpRight size={18} /></a></div></article></section>
+      <section className="he-surface he-section"><div className="he-container"><div className="he-heading he-reveal"><Eyebrow>HOW UPDATES WILL WORK</Eyebrow><h2>Useful details.<br /><em>No vague announcements.</em></h2></div><div className="he-values he-values--three"><article className="he-value he-reveal"><span><CheckCircle2 size={21} /></span><h3>What changed</h3><p>A plain-English explanation of the released improvement.</p></article><article className="he-value he-reveal"><span><Bell size={21} /></span><h3>Who it's for</h3><p>Availability and relevant plan restrictions will be clear.</p></article><article className="he-value he-reveal"><span><CalendarDays size={21} /></span><h3>When it shipped</h3><p>Real release dates, only when they have been verified.</p></article></div></div></section>
+      <ClosingCTA label="MEET HEYBIO" title="Discover the product behind the updates." description="Learn what HEYBIO is designed to help you create." href="/features" action="Explore features" />
+    </EditorialLayout>
   );
 }

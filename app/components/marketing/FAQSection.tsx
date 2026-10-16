@@ -1,77 +1,29 @@
-
 import { ArrowUpRight, Plus } from "lucide-react";
 
-const faqs = [
-  {
-    question: "What is HEYBIO?",
-    answer:
-      "HEYBIO is a creator link-in-bio and mini website platform. It helps you bring your important links, content and work together in one personal page."
-  },
-  {
-    question: "Can I start for free?",
-    answer:
-      "Yes. The Free plan costs ₹0 and includes a public profile and essential links."
-  },
-  {
-    question: "Can I customize my page?",
-    answer:
-      "Custom themes and advanced appearance options are included in eligible paid plans. Available customization depends on the implemented features."
-  },
-  {
-    question: "Which plans include HYPE DROP?",
-    answer:
-      "Premium and Pro Max include HYPE DROP eligibility. Free and Pro do not. Access also requires an active, verified eligible subscription."
-  },
-  {
-    question: "How do paid subscriptions work?",
-    answer:
-      "Paid plans are billed monthly through an authorized payment flow. Activation depends on server-verified payment and subscription status. The applicable billing terms are shown during checkout."
-  },
-  {
-    question: "Can I cancel my subscription?",
-    answer:
-      "Cancellation is managed through the billing system. The effective cancellation date and access period depend on your verified subscription and provider status."
-  },
-  {
-    question: "Do visitors need an account?",
-    answer:
-      "Visitors should be able to open a published public HEYBIO profile without creating an account."
-  }
+const questions = [
+  { q: "What exactly is HEYBIO?", a: "HEYBIO is a link-in-bio and mini website platform. Create a personal page for your links, social accounts, content and work — and share it with one link." },
+  { q: "Can I really start for free?", a: "Yes. The Free plan is ₹0 and includes essential link management and a public creator profile. Optional paid plans are explained on our Pricing page." },
+  { q: "Do my visitors need to sign up?", a: "No. Visitors can open a public creator page and follow its links without creating a HEYBIO account." },
+  { q: "Can I change my links later?", a: "Yes. You can manage your profile and links from your creator dashboard. Some customization features depend on your plan." },
+  { q: "Is HYPE DROP included for everyone?", a: "No. HYPE DROP is a separate DIPO LABS product. Only verified active Premium and Pro Max subscribers are eligible; Free and Pro are not. Cross-product access integration is still in development." },
+  { q: "Where can I get help?", a: "Email our team at dipolabs123@gmail.com. You can also reach us through the Contact page." },
 ] as const;
 
 export default function FAQSection() {
   return (
-    <section
-      id="faq"
-      className="hm-section hm-faq"
-      aria-labelledby="hm-faq-title"
-    >
-      <div className="hm-wrap hm-faq__grid">
-        <div>
-          <span className="hm-eyebrow">GOOD TO KNOW</span>
-          <h2 id="hm-faq-title">Questions? Meet answers.</h2>
-          <p>
-            The essentials about creating, sharing and managing
-            your HEYBIO.
-          </p>
-
-          <a
-            className="hm-inline-link"
-            href="mailto:dipolabs123@gmail.com?subject=HEYBIO%20Support"
-          >
-            Contact support
-            <ArrowUpRight size={17} aria-hidden="true" />
-          </a>
+    <section className="hx-section hx-faq" id="faq" aria-labelledby="hx-faq-title">
+      <div className="hx-container hx-faq__grid">
+        <div className="hx-faq__copy" data-hx-reveal>
+          <span className="hx-kicker">QUESTIONS, ANSWERED</span>
+          <h2 id="hx-faq-title">Good to know.<span> Easy to understand.</span></h2>
+          <p>Clear answers for creators starting their HEYBIO journey.</p>
+          <a className="hx-text-link" href="mailto:dipolabs123@gmail.com?subject=HEYBIO%20Support">Talk to support <ArrowUpRight size={17}/></a>
         </div>
-
-        <div className="hm-faq__items">
-          {faqs.map((faq) => (
-            <details key={faq.question}>
-              <summary>
-                <span>{faq.question}</span>
-                <Plus size={19} aria-hidden="true" />
-              </summary>
-              <p>{faq.answer}</p>
+        <div className="hx-faq__items" data-hx-reveal>
+          {questions.map(({ q, a }) => (
+            <details className="hx-faq__item" key={q}>
+              <summary><span>{q}</span><Plus size={18} aria-hidden="true"/></summary>
+              <p>{a}</p>
             </details>
           ))}
         </div>

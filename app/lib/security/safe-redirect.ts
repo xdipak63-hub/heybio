@@ -70,3 +70,21 @@ export function getSafeRedirectFromRequest(
     url.searchParams.get(parameter)
   );
 }
+/**
+ * Normalize links supplied by creators; never accept script or custom schemes.
+ * Callers should render returned URLs as normal external anchors (not fetch them on the server).
+ */
+export function normalizeExternalUrl(input: unknown): string | null {
+  if (typeof input !== "string") return null;
+  const value = input.trim();
+  if (!value || value.length > 2048 || /[\u0000-\u001F\u007F\\]/.test(value)) return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    if (!url.hostname || url.username || url.password) return null;
+    if (url.hostname === "localhost" || url.hostname.endsWith(".localhost")) return null;
+    return url.href;
+  } catch {
+    return null;
+  }
+}

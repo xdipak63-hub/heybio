@@ -1,26 +1,43 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import {
   ArrowUpRight,
   Check,
   LoaderCircle,
-  Sparkles,
 } from "lucide-react";
-
 import { openHeybioIntro } from "./IntroExperience";
 
-const USERNAME_PATTERN = /^[a-z][a-z0-9_]{2,29}$/;
+type CheckState =
+  | "checking"
+  | "available"
+  | "taken"
+  | "unknown";
+
+type AvailabilityResponse = {
+  available?: boolean;
+  message?: string;
+};
+
+type UsernameCheck = {
+  name: string;
+  state: CheckState;
+  message: string;
+};
+
+const VALID_USERNAME = /^[a-z][a-z0-9_]{2,29}$/;
 
 const RESERVED = new Set([
   "admin",
   "administrator",
   "api",
+  "app",
   "auth",
   "billing",
   "callback",
   "contact",
   "dashboard",
   "dipolabs",
+  "dipo_labs",
   "explore",
   "features",
   "forgot-password",
@@ -29,188 +46,236 @@ const RESERVED = new Set([
   "hypedrop",
   "login",
   "logout",
+  "me",
   "news",
   "onboarding",
+  "official",
   "pricing",
   "privacy",
+  "register",
   "reset-password",
+  "root",
+  "security",
   "settings",
   "signup",
+  "staff",
   "support",
+  "system",
   "templates",
+  "terms",
   "verify-email",
   "www",
+  "our-story",
+  "about-heybio",
+  "about-dipolabs",
+  "whats-new",
+  "report-problem",
+  "getting-started",
+  "faqs",
+  "cookie-policy",
+  "refund-policy",
+  "cookies",
+  "community-guidelines",
+  "analytics",
+  "legal",
 ]);
 
-type AvailabilityResponse = {
-  available: boolean;
-  message: string;
-};
-
 export default function UsernameClaim() {
-  const [username, setUsername] = useState("");
-  const [availability, setAvailability] =
-    useState<AvailabilityResponse | null>(null);
-  const [checking, setChecking] = useState(false);
+  const inputId = useId();
+  const feedbackId = useId();
 
-  const normalized = username.trim().toLowerCase();
+  const [username, setUsername] = useState("");
+  const [check, setCheck] = useState<UsernameCheck | null>(
+    null,
+  );
+
+  const name = username.trim().toLowerCase();
 
   const valid =
-    USERNAME_PATTERN.test(normalized) &&
-    !RESERVED.has(normalized);
+    VALID_USERNAME.test(name) && !RESERVED.has(name);
+
+  const current = check?.name === name ? check : null;
+  const isTaken = current?.state === "taken";
+
+  // This is a preview check, not final username ownership.
+  const canContinue = valid && !isTaken;
 
   useEffect(() => {
-    setAvailability(null);
-    setChecking(false);
-
     if (!valid) return;
 
     const controller = new AbortController();
     let active = true;
 
-    const timeout = window.setTimeout(async () => {
-      if (!active) return;
-      setChecking(true);
+    setCheck({
+      name,
+      state: "checking",
+      message: "Checking this username…",
+    });
 
+    const timer = window.setTimeout(async () => {
       try {
         const response = await fetch(
-          `/api/username-availability?username=${encodeURIComponent(
-            normalized,
-          )}`,
+          `/api/username-availability?username=${encodeURIComponent(name)}`,
           {
             signal: controller.signal,
-            headers: { Accept: "application/json" },
+            headers: {
+              Accept: "application/json",
+            },
           },
         );
 
         if (!response.ok) {
-          throw new Error("Availability check failed");
+          throw new Error("Preview check unavailable");
         }
 
-        const data: AvailabilityResponse =
-          await response.json();
+        const result =
+          (await response.json()) as AvailabilityResponse;
 
-        if (active) {
-          setAvailability(data);
-        }
+        if (!active) return;
+
+        setCheck({
+          name,
+          state:
+            result.available === true ? "available" : "taken",
+          message:
+            typeof result.message === "string"
+              ? result.message
+              : result.available === true
+                ? "Looks available! You can continue."
+                : "That username is already taken. Try another.",
+        });
       } catch (error) {
         if (
-          error instanceof Error &&
-          error.name === "AbortError"
+          !active ||
+          (error instanceof Error &&
+            error.name === "AbortError")
         ) {
           return;
         }
 
-        if (active) {
-          setAvailability({
-            available: false,
-            message: "Unable to check right now. Try again.",
-          });
-        }
-      } finally {
-        if (active) {
-          setChecking(false);
-        }
+        setCheck({
+          name,
+          state: "unknown",
+          message:
+            "Availability couldn't be checked yet. You can continue; we'll confirm it during setup.",
+        });
       }
     }, 400);
 
     return () => {
       active = false;
-      window.clearTimeout(timeout);
+      window.clearTimeout(timer);
       controller.abort();
     };
-  }, [normalized, valid]);
+  }, [name, valid]);
 
-  const canClaim =
-    valid && availability?.available === true && !checking;
-
-  function claim(event: React.FormEvent<HTMLFormElement>) {
+  function claim(
+    event: React.FormEvent<HTMLFormElement>,
+  ) {
     event.preventDefault();
 
-    if (!canClaim) return;
+    if (!canContinue) return;
 
-    try {
-      sessionStorage.setItem(
-        "heybio:desired-username",
-        normalized,
-      );
-    } catch {
-      // URL fallback is handled by the intro.
-    }
+    openHeybioIntro(name);
+  }
 
-    openHeybioIntro(normalized);
+  let message = "Choose a username to start your page.";
+
+  if (name && !valid) {
+    message =
+      "Use 3–30 characters, start with a letter, and use only letters, numbers or underscores.";
+  } else if (valid) {
+    message = current?.message ?? "Checking this username…";
   }
 
   return (
-    <form className="hb-claim" onSubmit={claim} noValidate>
-      <label htmlFor="hb-username" className="hb-claim__label">
-        <Sparkles size={16} />
-        YOUR INTERNET ADDRESS STARTS HERE
+    <form
+      className="hx-claim"
+      onSubmit={claim}
+      noValidate
+    >
+      <label
+        className="hx-claim__label"
+        htmlFor={inputId}
+      >
+        Claim your own corner of the internet
       </label>
 
-      <div className="hb-claim__field">
-        <span className="hb-claim__prefix">
-          heybio.in/
-        </span>
+      <div className="hx-claim__row">
+        <div className="hx-claim__input-wrap">
+          <span
+            className="hx-claim__prefix"
+            aria-hidden="true"
+          >
+            heybio.in/
+          </span>
 
-        <input
-          id="hb-username"
-          name="username"
-          value={username}
-          onChange={(event) => {
-            setUsername(
-              event.target.value
-                .toLowerCase()
-                .replace(/[^a-z0-9_]/g, "")
-                .slice(0, 30),
-            );
-          }}
-          placeholder="yourname"
-          autoComplete="off"
-          autoCapitalize="none"
-          spellCheck={false}
-          minLength={3}
-          maxLength={30}
-          required
-          aria-describedby="hb-claim-feedback"
-        />
-
-        {checking ? (
-          <LoaderCircle
-            className="hb-spin"
-            size={20}
-            aria-label="Checking availability"
+          <input
+            id={inputId}
+            type="text"
+            name="username"
+            value={username}
+            onChange={(event) =>
+              setUsername(
+                event.target.value
+                  .toLowerCase()
+                  .replace(/[^a-z0-9_]/g, "")
+                  .slice(0, 30),
+              )
+            }
+            placeholder="yourname"
+            minLength={3}
+            maxLength={30}
+            inputMode="text"
+            autoComplete="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            required
+            aria-invalid={
+              name.length > 0 && (!valid || isTaken)
+            }
+            aria-describedby={feedbackId}
           />
-        ) : canClaim ? (
-          <Check size={20} color="#418500" />
-        ) : null}
+
+          {current?.state === "checking" ? (
+            <LoaderCircle
+              size={18}
+              className="hx-claim__spin"
+              aria-label="Checking username"
+            />
+          ) : current?.state === "available" ? (
+            <Check
+              size={18}
+              className="hx-claim__tick"
+              aria-label="Username appears available"
+            />
+          ) : null}
+        </div>
+
+        <button
+          className="hx-claim__button"
+          type="submit"
+          disabled={!canContinue}
+        >
+          Claim my HEYBIO
+          <ArrowUpRight
+            size={18}
+            aria-hidden="true"
+          />
+        </button>
       </div>
 
-      <div
-        id="hb-claim-feedback"
-        className="hb-claim__feedback"
+      <p
+        id={feedbackId}
+        role="status"
         aria-live="polite"
+        className={`hx-claim__feedback ${
+          current?.state === "available"
+            ? "hx-claim__feedback--ok"
+            : ""
+        }`}
       >
-        {username.length > 0 && !valid
-          ? "Use 3–30 characters, starting with a letter. Letters, numbers and underscores only."
-          : checking
-            ? "Checking your username..."
-            : availability?.message ??
-              "Pick a name that's uniquely yours."}
-      </div>
-
-      <button
-        type="submit"
-        className="hb-claim__button"
-        disabled={!canClaim}
-      >
-        Claim my HEYBIO
-        <ArrowUpRight size={22} />
-      </button>
-
-      <p className="hb-claim__fineprint">
-        Free to start. No credit card required.
-        Username is secured after signup and verification.
+        {message}
       </p>
     </form>
   );

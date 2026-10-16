@@ -1,164 +1,47 @@
 import type { MetaFunction } from "react-router";
-import {
-  ArrowUpRight,
-  BarChart3,
-  Globe2,
-  Link2,
-  Palette,
-  ShieldCheck,
-  Smartphone,
-  Sparkles,
-} from "lucide-react";
-
-import Navbar from "../../components/marketing/Navbar";
-import PremiumFooter from "../../components/marketing/PremiumFooter";
+import { ArrowRight, ArrowUpRight, CheckCircle2, Link2, Palette, Smartphone, Layers3 } from "lucide-react";
+import { ActionLink, ClosingCTA, EditorialHero, EditorialLayout, Eyebrow, ExampleProfile } from "../../components/marketing/EditorialLayout";
 
 export const meta: MetaFunction = () => [
-  { title: "Features — HEYBIO by DIPO LABS" },
-  {
-    name: "description",
-    content:
-      "Explore HEYBIO's creator profiles, link management, customization and analytics vision.",
-  },
+  { title: "Features — HEYBIO | Your world. One link." },
+  { name: "description", content: "Your links, content and work on one beautifully simple HEYBIO creator page. Explore how HEYBIO works." },
 ];
 
-const features = [
-  {
-    icon: Link2,
-    number: "01",
-    title: "One home for every link",
-    description:
-      "Bring your websites, social profiles, projects and content together in one shareable destination.",
-  },
-  {
-    icon: Palette,
-    number: "02",
-    title: "Make it yours",
-    description:
-      "Create a profile that reflects your identity with personalized layouts, colors and presentation.",
-  },
-  {
-    icon: Smartphone,
-    number: "03",
-    title: "Designed for mobile",
-    description:
-      "Your audience can discover your content through a clean, responsive experience.",
-  },
-  {
-    icon: BarChart3,
-    number: "04",
-    title: "Understand engagement",
-    description:
-      "Creator analytics are part of the HEYBIO platform roadmap, helping you understand visits and link activity.",
-  },
-  {
-    icon: Globe2,
-    number: "05",
-    title: "Share everywhere",
-    description:
-      "Use your HEYBIO address across social platforms, messages, portfolios and other online spaces.",
-  },
-  {
-    icon: ShieldCheck,
-    number: "06",
-    title: "Security by design",
-    description:
-      "The platform is designed around authenticated account access, protected data and server-side authorization.",
-  },
-];
+const steps = [
+  ["01", "Claim your username", "Start with a name people can remember."],
+  ["02", "Make it personal", "Give your page a photo, bio and style."],
+  ["03", "Add what matters", "Keep important links in one easy-to-find place."],
+  ["04", "Share your world", "Use your HEYBIO address wherever people discover you."],
+] as const;
 
 export default function FeaturesPage() {
   return (
-    <>
-      <Navbar />
+    <EditorialLayout>
+      <EditorialHero label="HEYBIO / FEATURES" title={<>Everything you share.<br /><em>Beautifully together.</em></>} description="A personal mini website for your content, portfolio, social accounts and favorite places online. One link that feels like you.">
+        <div className="he-actions"><ActionLink href="/#claim-username">Create your page</ActionLink><ActionLink href="#how-it-works" secondary>See how it works</ActionLink></div>
+        <p className="he-fine"><CheckCircle2 size={16} /> Start free · Build at your own pace</p>
+      </EditorialHero>
 
-      <main>
-        <section className="page-hero container">
-          <span className="eyebrow">HEYBIO / FEATURES</span>
+      <section className="he-container he-showcase he-section he-reveal" aria-labelledby="he-f-visual">
+        <div className="he-showcase__copy"><Eyebrow>ONE BEAUTIFUL SPACE</Eyebrow><h2 id="he-f-visual">A better first impression starts here.</h2><p>Instead of sending people to five different places, share one page that helps them find your best work, your social profiles and a way to connect.</p><a className="he-text-link" href="/templates">Explore page styles <ArrowUpRight size={18} /></a></div>
+        <div className="he-showcase__art"><div className="he-orbit he-orbit--one">Instagram ↗</div><div className="he-orbit he-orbit--two">Portfolio ↗</div><div className="he-orbit he-orbit--three">YouTube ↗</div><ExampleProfile /></div>
+      </section>
 
-          <h1>
-            Everything you share.
-            <br />
-            <span>Beautifully connected.</span>
-          </h1>
-
-          <p>
-            A more expressive home for your digital identity.
-            Built for creators, businesses and anyone with
-            something worth sharing.
-          </p>
-
-          <a href="/#pricing" className="button button--dark">
-            Explore plans
-            <ArrowUpRight size={18} aria-hidden="true" />
-          </a>
-        </section>
-
-        <section
-          className="container"
-          aria-labelledby="features-title"
-          style={{ paddingBottom: 100 }}
-        >
-          <div className="section-heading">
-            <span className="eyebrow">BUILT WITH PURPOSE</span>
-            <h2 id="features-title">
-              The tools behind your presence.
-            </h2>
+      <section className="he-surface he-section" aria-labelledby="he-f-benefits">
+        <div className="he-container">
+          <div className="he-heading he-reveal"><Eyebrow>BUILT FOR REAL LIFE</Eyebrow><h2 id="he-f-benefits">Less searching.<br /><em>More discovering.</em></h2><p>Simple tools for a more organized online presence.</p></div>
+          <div className="he-feature-grid">
+            <article className="he-feature he-feature--wide he-reveal"><div className="he-feature__top"><Link2 /><span>01 / LINKS</span></div><h3>Put your best link first.</h3><p>Add, organize and update your destinations whenever your work changes.</p><div className="he-link-list" aria-hidden="true"><span>↕ &nbsp; Latest video <ArrowUpRight size={16} /></span><span>↕ &nbsp; My portfolio <ArrowUpRight size={16} /></span><span>↕ &nbsp; Contact & collaborations <ArrowUpRight size={16} /></span></div></article>
+            <article className="he-feature he-feature--lime he-reveal"><Palette /><h3>Make it feel like you.</h3><p>Choose a profile look, then build a page that reflects your personality. Some customization features vary by plan.</p><div className="he-swatch-row" aria-label="Brand-color samples"><span /><span /><span /></div></article>
+            <article className="he-feature he-reveal"><Smartphone /><h3>Ready for small screens.</h3><p>A simple layout your audience can browse comfortably from a phone.</p><div className="he-feature__label">MOBILE-FIRST THINKING</div></article>
+            <article className="he-feature he-feature--wide he-reveal"><Layers3 /><h3>One place to keep up with your work.</h3><p>Change links and refresh your public profile without needing to rebuild an entire website each time.</p><div className="he-feature__bars" aria-hidden="true"><span /><span /><span /></div></article>
           </div>
+        </div>
+      </section>
 
-          <div className="feature-grid">
-            {features.map((feature) => {
-              const Icon = feature.icon;
-
-              return (
-                <article
-                  className="feature-card"
-                  key={feature.number}
-                >
-                  <span className="eyebrow">
-                    {feature.number}
-                  </span>
-
-                  <Icon
-                    size={32}
-                    strokeWidth={1.6}
-                    aria-hidden="true"
-                  />
-
-                  <h3>{feature.title}</h3>
-                  <p>{feature.description}</p>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-
-        <section
-          className="container"
-          style={{ paddingBottom: 100 }}
-        >
-          <div className="section-heading">
-            <span className="eyebrow">
-              THE HEYBIO EXPERIENCE
-            </span>
-
-            <h2>Simple to share. Made to stand out.</h2>
-
-            <p>
-              Our focus is an intuitive creator experience,
-              distinctive visual design and a reliable
-              foundation that can grow with the platform.
-            </p>
-          </div>
-
-          <a href="/contact" className="button button--dark">
-            Get in touch
-            <Sparkles size={18} aria-hidden="true" />
-          </a>
-        </section>
-      </main>
-
-      <PremiumFooter />
-    </>
+      <section className="he-container he-section" id="how-it-works" aria-labelledby="he-f-steps"><div className="he-heading he-reveal"><Eyebrow>FOUR SIMPLE STEPS</Eyebrow><h2 id="he-f-steps">From idea to<br /><em>your own space.</em></h2></div><div className="he-steps">{steps.map(([num, title, text]) => <article className="he-step he-reveal" key={num}><span>{num}</span><h3>{title}</h3><p>{text}</p><ArrowRight size={19} aria-hidden="true" /></article>)}</div></section>
+      <section className="he-container he-note he-reveal"><CheckCircle2 size={23} /><p><strong>Good to know:</strong> HEYBIO has a free plan. Paid features and HYPE DROP eligibility are explained separately on the <a href="/pricing">Pricing page</a>.</p></section>
+      <ClosingCTA title="Your work deserves a better link." description="Start with the essentials and make your page your own." />
+    </EditorialLayout>
   );
 }

@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router";
 import {
   ArrowLeft,
@@ -7,146 +8,278 @@ import {
   ArrowUpRight,
   Check,
   Globe2,
+  Instagram,
   Link2,
+  Music2,
   Palette,
+  Play,
+  ShieldCheck,
   Sparkles,
   X,
 } from "lucide-react";
 
 export const HEYBIO_INTRO_EVENT = "heybio:open-intro";
 
+const USERNAME_PATTERN = /^[a-z][a-z0-9_]{2,29}$/;
+const SESSION_KEY = "heybio:desired-username";
+
 export function openHeybioIntro(username: string): void {
   if (typeof window === "undefined") return;
 
+  const normalized = username.trim().toLowerCase();
+  if (!USERNAME_PATTERN.test(normalized)) return;
+
   window.dispatchEvent(
     new CustomEvent(HEYBIO_INTRO_EVENT, {
-      detail: { username },
+      detail: { username: normalized },
     }),
   );
 }
 
-type Slide = {
+type IntroSlide = {
   eyebrow: string;
-  title: string;
-  accentText: string;
+  firstLine: string;
+  secondLine: string;
   description: string;
-  note: string;
-  Icon: typeof Link2;
+  takeaway: string;
 };
 
-const slides: readonly Slide[] = [
+const SLIDES: readonly IntroSlide[] = [
   {
-    eyebrow: "WELCOME TO YOUR WORLD",
-    title: "One place.",
-    accentText: "All of you.",
+    eyebrow: "01 / BRING IT TOGETHER",
+    firstLine: "Everything you share.",
+    secondLine: "One beautiful place.",
     description:
-      "Your links, stories and creativity deserve a beautiful home.",
-    note: "Your corner of the internet starts here.",
-    Icon: Link2,
+      "Your videos, music, social profiles, store and projects finally have a place to belong.",
+    takeaway: "One page, instead of a dozen scattered links.",
   },
   {
-    eyebrow: "MAKE IT YOURS",
-    title: "Your style.",
-    accentText: "Your rules.",
+    eyebrow: "02 / MAKE IT YOURS",
+    firstLine: "Your name.",
+    secondLine: "Your kind of space.",
     description:
-      "Create a digital space that looks and feels exactly like you.",
-    note: "Beautifully personal. Effortlessly yours.",
-    Icon: Palette,
+      "Give your page a personality with your photo, bio, links and a style that feels like you.",
+    takeaway: "Start simple. Make it unmistakably yours.",
   },
   {
-    eyebrow: "READY FOR THE WORLD",
-    title: "One link.",
-    accentText: "Every possibility.",
+    eyebrow: "03 / SHARE YOUR WORLD",
+    firstLine: "One little link.",
+    secondLine: "So much possibility.",
     description:
-      "Bring everything together and share your world with anyone.",
-    note: "Your next chapter starts right here.",
-    Icon: Globe2,
+      "Add your HEYBIO link wherever people discover you. Keep your world easy to find.",
+    takeaway: "Your first step is creating your account.",
   },
 ];
 
-const USERNAME_PATTERN = /^[a-z][a-z0-9_]{2,29}$/;
+function saveDesiredUsername(username: string): void {
+  try {
+    window.sessionStorage.setItem(SESSION_KEY, username);
+  } catch {
+    // Signup URL also preserves the requested username.
+  }
+}
+
+function ArtCard({
+  step,
+  username,
+}: {
+  step: number;
+  username: string;
+}) {
+  return (
+    <div
+      className={`hb-journey__stack hb-journey__stack--${step}`}
+      aria-hidden="true"
+    >
+      <div className="hb-journey__orbit hb-journey__orbit--one" />
+      <div className="hb-journey__orbit hb-journey__orbit--two" />
+
+      <div className="hb-journey__card hb-journey__card--four">
+        <span>YOUR WORLD</span>
+        <Sparkles size={19} />
+      </div>
+
+      <div className="hb-journey__card hb-journey__card--three">
+        <span>CREATE</span>
+        <Palette size={20} />
+      </div>
+
+      <div className="hb-journey__card hb-journey__card--two">
+        <span>CONNECT</span>
+        <Globe2 size={20} />
+      </div>
+
+      <div
+        className="hb-journey__card hb-journey__card--front"
+        key={step}
+      >
+        <div className="hb-journey__card-top">
+          <span className="hb-journey__card-brand">
+            HEYBIO <ArrowUpRight size={15} />
+          </span>
+          <span className="hb-journey__card-index">
+            0{step + 1} / 03
+          </span>
+        </div>
+
+        {step === 0 && (
+          <div className="hb-journey__demo hb-journey__demo--links">
+            <span className="hb-journey__demo-tag">
+              YOUR DIGITAL HOME
+            </span>
+            <h3>
+              All your links.
+              <br />
+              Just one page.
+            </h3>
+
+            <div className="hb-journey__mini-links">
+              <div>
+                <Instagram size={18} />
+                <span>Instagram</span>
+                <ArrowUpRight size={17} />
+              </div>
+              <div>
+                <Play size={18} />
+                <span>Latest video</span>
+                <ArrowUpRight size={17} />
+              </div>
+              <div>
+                <Music2 size={18} />
+                <span>My music</span>
+                <ArrowUpRight size={17} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div className="hb-journey__demo hb-journey__demo--identity">
+            <div className="hb-journey__profile-mark">
+              {username.charAt(0).toUpperCase()}
+            </div>
+            <span className="hb-journey__demo-tag">
+              A PAGE THAT FEELS LIKE YOU
+            </span>
+            <h3>@{username}</h3>
+            <p>Creator · Explorer · Original</p>
+
+            <div className="hb-journey__identity-links">
+              <span>
+                My latest work <ArrowUpRight size={15} />
+              </span>
+              <span>
+                Let's connect <ArrowUpRight size={15} />
+              </span>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="hb-journey__demo hb-journey__demo--share">
+            <div className="hb-journey__share-icon">
+              <Link2 size={29} />
+            </div>
+            <span className="hb-journey__demo-tag">
+              ONE LINK. EVERYWHERE.
+            </span>
+            <h3>
+              Ready to
+              <br />
+              be discovered.
+            </h3>
+
+            <div className="hb-journey__address">
+              <span>heybio.in/{username}</span>
+              <Check size={17} />
+            </div>
+          </div>
+        )}
+
+        <div className="hb-journey__card-bottom">
+          <span>YOUR WORLD. ONE LINK.</span>
+          <ArrowUpRight size={18} />
+        </div>
+      </div>
+
+      <div className="hb-journey__float-note hb-journey__float-note--one">
+        <Check size={15} /> Your space
+      </div>
+      <div className="hb-journey__float-note hb-journey__float-note--two">
+        Made for you <Sparkles size={15} />
+      </div>
+    </div>
+  );
+}
 
 export default function IntroExperience() {
   const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [username, setUsername] = useState("");
-  const [direction, setDirection] = useState<"next" | "back">(
-    "next",
-  );
 
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    function handleOpen(event: Event): void {
-      const customEvent = event as CustomEvent<{
-        username?: string;
-      }>;
+    function handleOpen(event: Event) {
+      const detail = (
+        event as CustomEvent<{ username?: string }>
+      ).detail;
 
-      const requestedUsername =
-        customEvent.detail?.username?.trim().toLowerCase() ?? "";
+      const requested =
+        detail?.username?.trim().toLowerCase() ?? "";
 
-      if (!USERNAME_PATTERN.test(requestedUsername)) return;
+      if (!USERNAME_PATTERN.test(requested)) return;
 
-      previousFocusRef.current =
+      previouslyFocusedRef.current =
         document.activeElement instanceof HTMLElement
           ? document.activeElement
           : null;
 
-      setUsername(requestedUsername);
+      saveDesiredUsername(requested);
+      setUsername(requested);
       setStep(0);
-      setDirection("next");
-      setOpen(true);
+      setIsOpen(true);
     }
 
     window.addEventListener(HEYBIO_INTRO_EVENT, handleOpen);
 
-    return () => {
+    return () =>
       window.removeEventListener(HEYBIO_INTRO_EVENT, handleOpen);
-    };
   }, []);
 
   useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
 
-    closeButtonRef.current?.focus();
-
-    function handleKeyDown(event: KeyboardEvent): void {
+    function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         event.preventDefault();
-        setOpen(false);
+        setIsOpen(false);
         return;
       }
 
       if (event.key !== "Tab") return;
 
-      const container = document.querySelector<HTMLElement>(
-        ".hey-intro",
-      );
+      const nodes =
+        dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], [tabindex="0"]',
+        );
 
-      if (!container) return;
+      if (!nodes?.length) return;
 
-      const focusables = Array.from(
-        container.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), a[href]',
-        ),
-      );
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
 
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-
-      // Strict TypeScript: both elements must exist.
       if (!first || !last) return;
 
-      if (
-        event.shiftKey &&
-        document.activeElement === first
-      ) {
+      if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
       } else if (
@@ -158,191 +291,192 @@ export default function IntroExperience() {
       }
     }
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleKeyDown);
-      previousFocusRef.current?.focus();
+      document.removeEventListener("keydown", onKeyDown);
+      previouslyFocusedRef.current?.focus();
     };
-  }, [open]);
+  }, [isOpen]);
 
-  function finish(): void {
-    setOpen(false);
-
-    try {
-      sessionStorage.setItem(
-        "heybio:desired-username",
-        username,
-      );
-    } catch {
-      // Username is also passed through the signup URL.
-    }
+  function finish() {
+    saveDesiredUsername(username);
+    setIsOpen(false);
 
     navigate(
       `/signup?username=${encodeURIComponent(username)}`,
     );
   }
 
-  function next(): void {
-    if (step >= slides.length - 1) {
-      finish();
-      return;
-    }
+  const slide = SLIDES[step];
 
-    setDirection("next");
-    setStep((current) =>
-      Math.min(current + 1, slides.length - 1),
-    );
+  if (
+    !isOpen ||
+    !slide ||
+    typeof document === "undefined"
+  ) {
+    return null;
   }
 
-  function back(): void {
-    setDirection("back");
-    setStep((current) => Math.max(current - 1, 0));
-  }
-
-  // Safe array access for noUncheckedIndexedAccess.
-  const slide = slides[step];
-
-  if (!open || !slide) return null;
-
-  const Icon = slide.Icon;
-
-  return (
-    <div
-      className="hey-intro"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="hey-intro-title"
-    >
-      <div className="hey-intro__shell">
-        <header className="hey-intro__header">
-          <div className="hey-intro__brand">
-            HEYBIO
-            <ArrowUpRight aria-hidden="true" />
-          </div>
-
-          <button
-            ref={closeButtonRef}
-            className="hey-intro__skip"
-            type="button"
-            onClick={finish}
-          >
-            Skip intro
-            <X size={18} aria-hidden="true" />
-          </button>
-        </header>
-
-        <div
-          className="hey-intro__main"
-          key={`${step}-${direction}`}
-        >
-          <div className="hey-intro__copy">
-            <div className="hey-intro__eyebrow">
-              <Sparkles size={18} aria-hidden="true" />
-              {slide.eyebrow}
-            </div>
-
-            <h2
-              id="hey-intro-title"
-              className="hey-intro__title"
-            >
-              {slide.title}
-              <span>{slide.accentText}</span>
-            </h2>
-
-            <p className="hey-intro__description">
-              {slide.description}
-            </p>
-
-            <p className="hey-intro__note">
-              <Check size={19} aria-hidden="true" />
-              {slide.note}
-            </p>
-          </div>
-
-          <div
-            className="hey-intro__visual"
-            aria-hidden="true"
-          >
-            <div className="hey-intro__art">
-              <div className="hey-intro__art-inner">
-                <Icon strokeWidth={1.6} />
-              </div>
-
-              <div className="hey-intro__sticker hey-intro__sticker--top">
-                <Sparkles size={15} />
-                MAKE IT YOURS
-              </div>
-
-              <div className="hey-intro__sticker hey-intro__sticker--bottom">
-                YOUR SPACE. YOUR RULES.
-                <ArrowUpRight size={16} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <footer className="hey-intro__footer">
-          <div className="hey-intro__progress">
+  return createPortal(
+    <div className="hb-journey" role="presentation">
+      <div
+        className="hb-journey__dialog"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="hb-journey-heading"
+        aria-describedby="hb-journey-description"
+      >
+        <div className="hb-journey__canvas">
+          <header className="hb-journey__header">
             <div
-              className="hey-intro__dots"
-              aria-label={`Step ${step + 1} of ${slides.length}`}
+              className="hb-journey__logo"
+              aria-label="HEYBIO by DIPO LABS"
             >
-              {slides.map((item, index) => (
-                <button
-                  key={item.eyebrow}
-                  type="button"
-                  className={
-                    index === step
-                      ? "hey-intro__dot hey-intro__dot--active"
-                      : "hey-intro__dot"
-                  }
-                  onClick={() => {
-                    setDirection(
-                      index > step ? "next" : "back",
-                    );
-                    setStep(index);
-                  }}
-                  aria-label={`Go to step ${index + 1}`}
-                  aria-current={
-                    index === step ? "step" : undefined
-                  }
-                />
-              ))}
+              HEYBIO
+              <ArrowUpRight size={24} aria-hidden="true" />
             </div>
 
-            <span>
-              {String(step + 1).padStart(2, "0")} /{" "}
-              {String(slides.length).padStart(2, "0")}
-            </span>
-          </div>
+            <div className="hb-journey__header-right">
+              <span className="hb-journey__header-tag">
+                YOUR WORLD. ONE LINK.
+              </span>
 
-          <div className="hey-intro__actions">
-            <button
-              type="button"
-              className="hey-intro__back"
-              onClick={back}
-              disabled={step === 0}
-              aria-label="Previous slide"
+              <button
+                type="button"
+                className="hb-journey__text-button"
+                onClick={finish}
+              >
+                Skip intro
+                <ArrowUpRight size={16} aria-hidden="true" />
+              </button>
+
+              <button
+                type="button"
+                ref={closeRef}
+                className="hb-journey__close"
+                aria-label="Close intro and return to homepage"
+                onClick={() => setIsOpen(false)}
+              >
+                <X size={20} aria-hidden="true" />
+              </button>
+            </div>
+          </header>
+
+          <main className="hb-journey__body">
+            <div
+              className="hb-journey__copy"
+              key={`copy-${step}`}
             >
-              <ArrowLeft size={22} />
-            </button>
+              <div className="hb-journey__eyebrow">
+                <span />
+                {slide.eyebrow}
+              </div>
 
-            <button
-              type="button"
-              className="hey-intro__next"
-              onClick={next}
+              <h2 id="hb-journey-heading">
+                {slide.firstLine}
+                <br />
+                <span>{slide.secondLine}</span>
+              </h2>
+
+              <p id="hb-journey-description">
+                {slide.description}
+              </p>
+
+              <div className="hb-journey__takeaway">
+                <ShieldCheck size={20} aria-hidden="true" />
+                {slide.takeaway}
+              </div>
+
+              <div className="hb-journey__username">
+                <span>YOUR HEYBIO</span>
+                <strong>heybio.in/{username}</strong>
+              </div>
+            </div>
+
+            <div className="hb-journey__illustration">
+              <ArtCard step={step} username={username} />
+              <span className="hb-journey__visual-label">
+                A PREVIEW OF WHAT YOU CAN CREATE
+              </span>
+            </div>
+          </main>
+
+          <footer className="hb-journey__footer">
+            <div
+              className="hb-journey__steps"
+              aria-label="Intro steps"
             >
-              {step === slides.length - 1
-                ? "Create my HEYBIO"
-                : "Continue"}
+              {SLIDES.map((item, index) => (
+                <button
+                  type="button"
+                  key={item.eyebrow}
+                  className={`hb-journey__step ${
+                    step === index
+                      ? "hb-journey__step--active"
+                      : ""
+                  }`}
+                  aria-label={`Show step ${index + 1} of ${SLIDES.length}`}
+                  aria-current={
+                    step === index ? "step" : undefined
+                  }
+                  onClick={() => setStep(index)}
+                >
+                  <span />
+                </button>
+              ))}
 
-              <ArrowRight size={21} />
-            </button>
-          </div>
-        </footer>
+              <span className="hb-journey__steps-count">
+                0{step + 1} — 03
+              </span>
+            </div>
+
+            <div className="hb-journey__actions">
+              <button
+                type="button"
+                className="hb-journey__back"
+                disabled={step === 0}
+                aria-label="Previous intro step"
+                onClick={() =>
+                  setStep((current) =>
+                    Math.max(0, current - 1),
+                  )
+                }
+              >
+                <ArrowLeft size={20} aria-hidden="true" />
+              </button>
+
+              <button
+                type="button"
+                className="hb-journey__next"
+                onClick={() =>
+                  step === SLIDES.length - 1
+                    ? finish()
+                    : setStep((current) =>
+                        Math.min(
+                          SLIDES.length - 1,
+                          current + 1,
+                        ),
+                      )
+                }
+              >
+                {step === SLIDES.length - 1
+                  ? "Create my HEYBIO"
+                  : "Continue"}
+
+                <ArrowRight size={19} aria-hidden="true" />
+              </button>
+            </div>
+          </footer>
+
+          <span className="hb-journey__fineprint">
+            HEYBIO is a product of DIPO LABS.
+          </span>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

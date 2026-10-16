@@ -17,6 +17,23 @@ export default [
     "routes/marketing/pricing.tsx",
   ),
 
+  // Published marketing pages; leave unimplemented legal/support routes unregistered.
+  route("features", "routes/marketing/features.tsx"),
+  route("explore", "routes/marketing/explore.tsx"),
+  route("templates", "routes/marketing/templates.tsx"),
+  route("whats-new", "routes/marketing/whats-new.tsx"),
+  route("news", "routes/marketing/news.tsx"),
+  route("about-heybio", "routes/marketing/about-heybio.tsx"),
+  route("about-dipolabs", "routes/marketing/about-dipolabs.tsx"),
+  route("our-story", "routes/marketing/our-story.tsx"),
+  route("contact", "routes/marketing/contact.tsx"),
+
+  // Published legal documents
+  route("terms", "routes/legal/terms.tsx"),
+  route("privacy", "routes/legal/privacy.tsx"),
+  route("cookies", "routes/legal/cookies.tsx"),
+  route("community-guidelines", "routes/legal/community-guidelines.tsx"),
+
   // Authentication
   route(
     "signup",

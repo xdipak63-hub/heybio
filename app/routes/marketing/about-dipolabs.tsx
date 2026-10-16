@@ -1,98 +1,22 @@
 import type { MetaFunction } from "react-router";
-import { ArrowUpRight, Layers3, Rocket, ShieldCheck } from "lucide-react";
-
-import Navbar from "../../components/marketing/Navbar";
-import PremiumFooter from "../../components/marketing/PremiumFooter";
+import { ArrowUpRight, Boxes, Compass, Rocket, ShieldCheck } from "lucide-react";
+import { ActionLink, ClosingCTA, EditorialHero, EditorialLayout, Eyebrow } from "../../components/marketing/EditorialLayout";
 
 export const meta: MetaFunction = () => [
-  { title: "DIPO LABS — The Team Behind HEYBIO" },
-  {
-    name: "description",
-    content:
-      "Discover DIPO LABS, the creator of HEYBIO and HYPE DROP.",
-  },
+  { title: "About DIPO LABS — Creators of HEYBIO" },
+  { name: "description", content: "DIPO LABS builds HEYBIO and HYPE DROP as distinct creator-focused digital products." },
 ];
 
 export default function AboutDipoLabsPage() {
   return (
-    <>
-      <Navbar />
-
-      <main>
-        <section className="page-hero container">
-          <span className="eyebrow">COMPANY / DIPO LABS</span>
-
-          <h1>
-            Ideas deserve
-            <br />
-            <span>better experiences.</span>
-          </h1>
-
-          <p>
-            DIPO LABS is the brand behind HEYBIO and
-            HYPE DROP. We are focused on building
-            distinctive digital products.
-          </p>
-        </section>
-
-        <section
-          className="container"
-          style={{ paddingBottom: 100 }}
-        >
-          <div className="feature-grid">
-            <article className="feature-card">
-              <Layers3 size={32} aria-hidden="true" />
-              <h2>Product thinking</h2>
-              <p>
-                We approach products as complete experiences,
-                from the first interaction to everyday use.
-              </p>
-            </article>
-
-            <article className="feature-card">
-              <Rocket size={32} aria-hidden="true" />
-              <h2>Ambitious design</h2>
-              <p>
-                We aim for interfaces that are expressive,
-                purposeful and easy to understand.
-              </p>
-            </article>
-
-            <article className="feature-card">
-              <ShieldCheck size={32} aria-hidden="true" />
-              <h2>Responsible engineering</h2>
-              <p>
-                Authentication, data protection and
-                reliable integrations are central
-                to our development approach.
-              </p>
-            </article>
-          </div>
-        </section>
-
-        <section
-          className="container"
-          style={{ paddingBottom: 100 }}
-        >
-          <div className="section-heading">
-            <span className="eyebrow">OUR PRODUCTS</span>
-            <h2>Distinct products. Shared ambition.</h2>
-            <p>
-              HEYBIO is a creator identity platform.
-              HYPE DROP is a separate DIPO LABS product,
-              with access planned for eligible HEYBIO
-              subscription tiers.
-            </p>
-          </div>
-
-          <a href="/contact" className="button button--dark">
-            Contact DIPO LABS
-            <ArrowUpRight size={18} aria-hidden="true" />
-          </a>
-        </section>
-      </main>
-
-      <PremiumFooter />
-    </>
+    <EditorialLayout>
+      <EditorialHero label="COMPANY / DIPO LABS" title={<>Small details.<br /><em>Big ideas.</em></>} description="DIPO LABS is the creator of HEYBIO and HYPE DROP. We are building digital experiences with an eye for clarity, usefulness and personality.">
+        <div className="he-actions"><ActionLink href="/contact">Get in touch</ActionLink><ActionLink href="/our-story" secondary>Read our story</ActionLink></div>
+      </EditorialHero>
+      <section className="he-container he-section he-studio he-reveal"><div className="he-studio__top"><span>DIPO</span><span>LABS ↗</span></div><div className="he-studio__statement">Think clearly.<br /><em>Build thoughtfully.</em></div><div className="he-studio__bottom"><span>Independent product thinking</span><span>Designed for the next generation of creators</span></div></section>
+      <section className="he-container he-section" aria-labelledby="he-d-products"><div className="he-heading he-reveal"><Eyebrow>OUR PRODUCT FAMILY</Eyebrow><h2 id="he-d-products">Two ideas.<br /><em>Different jobs.</em></h2><p>Each DIPO LABS product has its own purpose and application boundaries.</p></div><div className="he-product-grid"><article className="he-product he-product--light he-reveal"><div className="he-product__top"><span>01 / CREATOR IDENTITY</span><Boxes size={23} /></div><h3>HEYBIO <span>↗</span></h3><p>One beautiful space for your links, work and online identity.</p><a href="/features">Discover HEYBIO <ArrowUpRight size={18} /></a></article><article className="he-product he-product--dark he-reveal"><div className="he-product__top"><span>02 / CREATOR LAUNCHES</span><Rocket size={23} /></div><h3>HYPE DROP <span>↗</span></h3><p>Make Every Launch Feel Legendary. A separate product focused on launch moments, countdowns and reveals.</p><small>HEYBIO HYPE DROP access is reserved for eligible Premium and Pro Max plans; cross-product integration is subject to rollout.</small><a href="/pricing">View plan eligibility <ArrowUpRight size={18} /></a></article></div></section>
+      <section className="he-surface he-section"><div className="he-container he-half"><div className="he-reveal"><Eyebrow>HOW WE THINK</Eyebrow><h2>Design is not decoration.<br /><em>It's how things work.</em></h2></div><div className="he-principles he-reveal"><div><Compass /><h3>Clarity</h3><p>Make the product easy to understand before adding complexity.</p></div><div><ShieldCheck /><h3>Responsibility</h3><p>Build on sound authentication, data access and trustworthy operations.</p></div><div><Rocket /><h3>Momentum</h3><p>Improve in thoughtful releases rather than making unverified promises.</p></div></div></div></section>
+      <ClosingCTA label="TALK TO DIPO LABS" title="Good ideas begin with a conversation." description="Have feedback, a partnership question or something to share?" href="/contact" action="Contact us" />
+    </EditorialLayout>
   );
 }

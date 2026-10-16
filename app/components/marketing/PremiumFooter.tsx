@@ -83,10 +83,10 @@ const footerGroups: readonly FooterGroup[] = [
   {
     title: "Legal",
     links: [
-      { label: "Terms of Service" },
-      { label: "Privacy Policy" },
-      { label: "Cookie Policy" },
-      { label: "Community Guidelines" },
+      { label: "Terms of Service", href: "/terms" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Cookie Policy", href: "/cookies" },
+      { label: "Community Guidelines", href: "/community-guidelines" },
     ],
   },
 ];

@@ -1,0 +1,107 @@
+
+# =====================================================
+# HEYBIO ↗ — LOCAL ENVIRONMENT CONFIGURATION TEMPLATE
+# Your world. One link.
+# A product of DIPO LABS
+# =====================================================
+#
+# PURPOSE:
+# This file documents the local development bindings.
+#
+# IMPORTANT:
+# - Never put actual private secrets in this file.
+# - Copy the required values into .dev.vars.
+# - Cloudflare Workers uses .dev.vars locally.
+# - Production bindings are configured separately.
+# - Never commit .dev.vars.
+#
+# =====================================================
+# 01 — SUPABASE AUTHENTICATION
+# =====================================================
+
+# Supabase Project Settings > Project URL
+SUPABASE_URL="https://YOUR_PROJECT_REF.supabase.co"
+
+# Supabase Project Settings > API Keys
+# Use the public publishable key, not the secret key.
+SUPABASE_PUBLISHABLE_KEY="sb_publishable_REPLACE_ME"
+
+
+# =====================================================
+# 02 — CLOUDFLARE TURNSTILE
+# =====================================================
+#
+# DEVELOPMENT ONLY:
+# The following are official testing credentials.
+# They do not provide real bot protection.
+# NEVER use them on the production website.
+#
+# Production requires real site/secret keys and
+# backend verification of each Turnstile token.
+
+TURNSTILE_SITE_KEY="1x00000000000000000000AA"
+
+TURNSTILE_SECRET_KEY="1x0000000000000000000000000000000AA"
+
+
+# =====================================================
+# 03 — GOOGLE AUTHENTICATION
+# =====================================================
+#
+# Google authentication is configured in:
+#
+# Supabase Dashboard
+# > Authentication
+# > Sign In / Providers
+# > Google
+#
+# Do not add the Google OAuth Client Secret here.
+#
+# Verify the following externally:
+#
+# 1. Google provider enabled in Supabase.
+# 2. Google Client ID and Secret configured there.
+# 3. Google Cloud has Supabase OAuth callback URI.
+# 4. Supabase redirect allowlist contains the
+#    exact HEYBIO /auth/callback URL.
+# 5. Test Google account is authorized if the
+#    OAuth application is in Testing mode.
+#
+# No additional Google secret is required here
+# for the current server-side OAuth implementation.
+
+
+# =====================================================
+# 04 — ADDITIONAL BACKEND SECRETS
+# =====================================================
+#
+# Add only when the corresponding backend modules
+# have been inspected and configured.
+#
+# Examples of future systems:
+#
+# - Server-side privileged Supabase operations
+# - Razorpay subscriptions and verified webhooks
+# - Payment reconciliation
+# - Admin operations
+# - Transactional email
+#
+# Do not invent environment variable names or
+# enable unused credentials ahead of implementation.
+
+
+# =====================================================
+# 05 — PRODUCTION SECURITY RULES
+# =====================================================
+#
+# - Use real Turnstile credentials on production.
+# - Configure Cloudflare Worker secrets securely.
+# - Keep database and payment secrets server-side.
+# - Enable Row Level Security in Supabase.
+# - Validate user access on the backend.
+# - Never commit secrets into Git.
+# - Never expose secrets through API responses.
+#
+# =====================================================
+# END — HEYBIO ENVIRONMENT TEMPLATE
+# =====================================================

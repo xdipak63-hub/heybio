@@ -17,6 +17,45 @@ type Pages = {
   "/pricing": {
     params: {};
   };
+  "/features": {
+    params: {};
+  };
+  "/explore": {
+    params: {};
+  };
+  "/templates": {
+    params: {};
+  };
+  "/whats-new": {
+    params: {};
+  };
+  "/news": {
+    params: {};
+  };
+  "/about-heybio": {
+    params: {};
+  };
+  "/about-dipolabs": {
+    params: {};
+  };
+  "/our-story": {
+    params: {};
+  };
+  "/contact": {
+    params: {};
+  };
+  "/terms": {
+    params: {};
+  };
+  "/privacy": {
+    params: {};
+  };
+  "/cookies": {
+    params: {};
+  };
+  "/community-guidelines": {
+    params: {};
+  };
   "/signup": {
     params: {};
   };
@@ -105,7 +144,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/pricing" | "/signup" | "/login" | "/auth/callback" | "/logout" | "/forgot-password" | "/reset-password" | "/verify-email" | "/auth/mfa-setup" | "/auth/mfa-verify" | "/onboarding/choose-username" | "/onboarding/choose-plan" | "/onboarding/create-profile" | "/onboarding/choose-template" | "/onboarding/complete" | "/dashboard" | "/dashboard/links" | "/dashboard/appearance" | "/admin" | "/api/social-links" | "/api/uploads" | "/api/username-availability" | "/api/checkout" | "/api/subscription-cancel" | "/api/razorpay-webhook" | "/api/hype-entitlement" | "/api/admin-actions" | "/:username";
+    page: "/" | "/pricing" | "/features" | "/explore" | "/templates" | "/whats-new" | "/news" | "/about-heybio" | "/about-dipolabs" | "/our-story" | "/contact" | "/terms" | "/privacy" | "/cookies" | "/community-guidelines" | "/signup" | "/login" | "/auth/callback" | "/logout" | "/forgot-password" | "/reset-password" | "/verify-email" | "/auth/mfa-setup" | "/auth/mfa-verify" | "/onboarding/choose-username" | "/onboarding/choose-plan" | "/onboarding/create-profile" | "/onboarding/choose-template" | "/onboarding/complete" | "/dashboard" | "/dashboard/links" | "/dashboard/appearance" | "/admin" | "/api/social-links" | "/api/uploads" | "/api/username-availability" | "/api/checkout" | "/api/subscription-cancel" | "/api/razorpay-webhook" | "/api/hype-entitlement" | "/api/admin-actions" | "/:username";
   };
   "routes/marketing/home.tsx": {
     id: "routes/marketing/home";
@@ -114,6 +153,58 @@ type RouteFiles = {
   "routes/marketing/pricing.tsx": {
     id: "routes/marketing/pricing";
     page: "/pricing";
+  };
+  "routes/marketing/features.tsx": {
+    id: "routes/marketing/features";
+    page: "/features";
+  };
+  "routes/marketing/explore.tsx": {
+    id: "routes/marketing/explore";
+    page: "/explore";
+  };
+  "routes/marketing/templates.tsx": {
+    id: "routes/marketing/templates";
+    page: "/templates";
+  };
+  "routes/marketing/whats-new.tsx": {
+    id: "routes/marketing/whats-new";
+    page: "/whats-new";
+  };
+  "routes/marketing/news.tsx": {
+    id: "routes/marketing/news";
+    page: "/news";
+  };
+  "routes/marketing/about-heybio.tsx": {
+    id: "routes/marketing/about-heybio";
+    page: "/about-heybio";
+  };
+  "routes/marketing/about-dipolabs.tsx": {
+    id: "routes/marketing/about-dipolabs";
+    page: "/about-dipolabs";
+  };
+  "routes/marketing/our-story.tsx": {
+    id: "routes/marketing/our-story";
+    page: "/our-story";
+  };
+  "routes/marketing/contact.tsx": {
+    id: "routes/marketing/contact";
+    page: "/contact";
+  };
+  "routes/legal/terms.tsx": {
+    id: "routes/legal/terms";
+    page: "/terms";
+  };
+  "routes/legal/privacy.tsx": {
+    id: "routes/legal/privacy";
+    page: "/privacy";
+  };
+  "routes/legal/cookies.tsx": {
+    id: "routes/legal/cookies";
+    page: "/cookies";
+  };
+  "routes/legal/community-guidelines.tsx": {
+    id: "routes/legal/community-guidelines";
+    page: "/community-guidelines";
   };
   "routes/auth/signup.tsx": {
     id: "routes/auth/signup";
@@ -233,6 +324,19 @@ type RouteModules = {
   "root": typeof import("./app/root.tsx");
   "routes/marketing/home": typeof import("./app/routes/marketing/home.tsx");
   "routes/marketing/pricing": typeof import("./app/routes/marketing/pricing.tsx");
+  "routes/marketing/features": typeof import("./app/routes/marketing/features.tsx");
+  "routes/marketing/explore": typeof import("./app/routes/marketing/explore.tsx");
+  "routes/marketing/templates": typeof import("./app/routes/marketing/templates.tsx");
+  "routes/marketing/whats-new": typeof import("./app/routes/marketing/whats-new.tsx");
+  "routes/marketing/news": typeof import("./app/routes/marketing/news.tsx");
+  "routes/marketing/about-heybio": typeof import("./app/routes/marketing/about-heybio.tsx");
+  "routes/marketing/about-dipolabs": typeof import("./app/routes/marketing/about-dipolabs.tsx");
+  "routes/marketing/our-story": typeof import("./app/routes/marketing/our-story.tsx");
+  "routes/marketing/contact": typeof import("./app/routes/marketing/contact.tsx");
+  "routes/legal/terms": typeof import("./app/routes/legal/terms.tsx");
+  "routes/legal/privacy": typeof import("./app/routes/legal/privacy.tsx");
+  "routes/legal/cookies": typeof import("./app/routes/legal/cookies.tsx");
+  "routes/legal/community-guidelines": typeof import("./app/routes/legal/community-guidelines.tsx");
   "routes/auth/signup": typeof import("./app/routes/auth/signup.tsx");
   "routes/auth/login": typeof import("./app/routes/auth/login.tsx");
   "routes/auth/callback": typeof import("./app/routes/auth/callback.tsx");

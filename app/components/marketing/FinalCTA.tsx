@@ -1,35 +1,15 @@
-
-import { ArrowUpRight, ShieldCheck } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 export default function FinalCTA() {
   return (
-    <section className="hm-final" aria-labelledby="hm-final-title">
-      <div className="hm-wrap hm-final__inner">
-        <span className="hm-eyebrow">YOUR NEXT CHAPTER</span>
-
-        <h2 id="hm-final-title">
-          The internet has room for
-          <span> your world.</span>
-        </h2>
-
-        <p>
-          Your work, your creativity, your favorite links.
-          Give them a place to belong.
-        </p>
-
-        <a href="/#claim-username" className="hm-button hm-button--lime">
-          Claim my HEYBIO
-          <ArrowUpRight size={19} aria-hidden="true" />
-        </a>
-
-        <div className="hm-final__note">
-          <ShieldCheck size={17} aria-hidden="true" />
-          Free to start. Your space, your choice.
-        </div>
-
-        <strong className="hm-final__signature">
-          HEYBIO <span>↗</span>
-        </strong>
+    <section className="hx-final" aria-labelledby="hx-final-title">
+      <div className="hx-container hx-final__content" data-hx-reveal>
+        <span className="hx-kicker">THE NEXT CHAPTER IS YOURS</span>
+        <h2 id="hx-final-title">Your world deserves<br/><span>its own place.</span></h2>
+        <p>Start with your name. Add what matters. Share a link that feels like you.</p>
+        <a className="hx-cta" href="/#claim-username">Claim my HEYBIO <ArrowUpRight size={19} aria-hidden="true"/></a>
+        <span className="hx-final__note">Free to start. Made to grow with you.</span>
+        <div className="hx-final__wordmark" aria-hidden="true">HEYBIO<span>↗</span></div>
       </div>
     </section>
   );

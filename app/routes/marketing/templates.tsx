@@ -1,176 +1,34 @@
+import { useState } from "react";
 import type { MetaFunction } from "react-router";
-import { ArrowUpRight, Palette, Sparkles } from "lucide-react";
-
-import Navbar from "../../components/marketing/Navbar";
-import PremiumFooter from "../../components/marketing/PremiumFooter";
+import { ArrowUpRight, Check, Palette, SlidersHorizontal } from "lucide-react";
+import { THEME_PRESETS } from "../../components/creator/ThemePicker";
+import { ActionLink, ClosingCTA, EditorialHero, EditorialLayout, Eyebrow } from "../../components/marketing/EditorialLayout";
 
 export const meta: MetaFunction = () => [
-  { title: "Templates — HEYBIO" },
-  {
-    name: "description",
-    content:
-      "Discover the visual directions behind HEYBIO creator profiles.",
-  },
+  { title: "Templates — Explore HEYBIO profile styles" },
+  { name: "description", content: "Preview HEYBIO creator page styles including Classic, Minimal, Midnight and Ice Blue." },
 ];
 
-const styles = [
-  {
-    name: "Minimal",
-    category: "CLEAN & SIMPLE",
-    background: "#F7F7F2",
-    foreground: "#171717",
-    accent: "#DCE7CF",
-  },
-  {
-    name: "Midnight",
-    category: "BOLD & MODERN",
-    background: "#171717",
-    foreground: "#FFFFFF",
-    accent: "#BDF806",
-  },
-  {
-    name: "Lavender",
-    category: "SOFT & CREATIVE",
-    background: "#EAE4FF",
-    foreground: "#27213C",
-    accent: "#FFFFFF",
-  },
-  {
-    name: "Sunset",
-    category: "WARM & EXPRESSIVE",
-    background: "#FFE5C7",
-    foreground: "#442419",
-    accent: "#FFBA82",
-  },
-] as const;
+const showcaseIds = ["classic", "minimal", "midnight", "ice"] as const;
+const showcase = showcaseIds.map((id) => {
+  const preset = THEME_PRESETS.find((theme) => theme.id === id);
+  if (!preset) throw new Error(`Missing HEYBIO theme preset: ${id}`);
+  return preset;
+});
 
 export default function TemplatesPage() {
+  const [selectedId, setSelectedId] = useState<(typeof showcaseIds)[number]>("classic");
+  const selected = showcase.find((theme) => theme.id === selectedId) ?? showcase[0]!;
+  const isDark = selected.id === "midnight";
+
   return (
-    <>
-      <Navbar />
-
-      <main>
-        <section className="page-hero container">
-          <span className="eyebrow">HEYBIO / TEMPLATES</span>
-
-          <h1>
-            Your style.
-            <br />
-            <span>Your digital space.</span>
-          </h1>
-
-          <p>
-            Explore design directions for a creator page
-            that feels unmistakably yours.
-          </p>
-        </section>
-
-        <section
-          className="container"
-          style={{ paddingBottom: 100 }}
-        >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit, minmax(min(100%, 250px), 1fr))",
-              gap: 24,
-            }}
-          >
-            {styles.map((style) => (
-              <article key={style.name}>
-                <div
-                  style={{
-                    background: style.background,
-                    color: style.foreground,
-                    minHeight: 350,
-                    borderRadius: 28,
-                    padding: 28,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 15,
-                    textAlign: "center",
-                  }}
-                >
-                  <div
-                    aria-hidden="true"
-                    style={{
-                      width: 76,
-                      height: 76,
-                      borderRadius: "50%",
-                      background: style.accent,
-                      display: "grid",
-                      placeItems: "center",
-                    }}
-                  >
-                    <Sparkles size={26} />
-                  </div>
-
-                  <strong style={{ fontSize: 22 }}>
-                    Your Name
-                  </strong>
-
-                  <span>Creator · Artist · Your world</span>
-
-                  {["My latest work", "Find me online"].map(
-                    (label) => (
-                      <div
-                        key={label}
-                        style={{
-                          background: style.accent,
-                          color: style.foreground,
-                          borderRadius: 14,
-                          padding: "13px 16px",
-                          width: "100%",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {label}
-                      </div>
-                    ),
-                  )}
-                </div>
-
-                <div style={{ padding: "20px 4px" }}>
-                  <span className="eyebrow">
-                    {style.category}
-                  </span>
-                  <h3>{style.name}</h3>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <p style={{ opacity: 0.7 }}>
-            These are visual concept previews, not live
-            creator accounts or a claim that every template
-            is already selectable in the editor.
-          </p>
-        </section>
-
-        <section
-          className="container"
-          style={{ paddingBottom: 100 }}
-        >
-          <div className="section-heading">
-            <Palette size={30} aria-hidden="true" />
-            <h2>Made for your identity.</h2>
-            <p>
-              HEYBIO is designed to let your content and
-              personal style take center stage.
-            </p>
-          </div>
-
-          <a href="/features" className="button button--dark">
-            Explore features
-            <ArrowUpRight size={18} aria-hidden="true" />
-          </a>
-        </section>
-      </main>
-
-      <PremiumFooter />
-    </>
+    <EditorialLayout>
+      <EditorialHero label="HEYBIO / TEMPLATES" title={<>Your style.<br /><em>Your own space.</em></>} description="A page can be simple, expressive or somewhere in between. Explore a few HEYBIO profile looks and find your starting point.">
+        <div className="he-actions"><ActionLink href="/#claim-username">Get started free</ActionLink><ActionLink href="#preview" secondary>Preview styles</ActionLink></div>
+      </EditorialHero>
+      <section className="he-surface he-section" id="preview" aria-labelledby="he-t-heading"><div className="he-container"><div className="he-heading he-reveal"><Eyebrow>LIVE-STYLE DEMO</Eyebrow><h2 id="he-t-heading">Choose a feel.<br /><em>See it instantly.</em></h2><p>These are illustrative previews based on real template presets in the application. This preview does not change or save your account theme.</p></div><div className="he-template-workspace he-reveal"><div className="he-template-controls"><div className="he-template-controls__title"><Palette size={22} /><h3>Explore styles</h3></div><p>Pick a preview style. Your public page will be customizable during setup, subject to your plan.</p><div className="he-template-options" aria-label="Template preview styles">{showcase.map((theme) => <button type="button" key={theme.id} className={selectedId === theme.id ? "he-template-option he-template-option--active" : "he-template-option"} aria-pressed={selectedId === theme.id} onClick={() => setSelectedId(theme.id)}><span className="he-template-option__swatch" style={{ backgroundColor: theme.background, color: theme.text }} aria-hidden="true">Aa</span><span><strong>{theme.name}</strong><small>{theme.id === "midnight" ? "Dark and bold" : theme.id === "ice" ? "Cool and light" : theme.id === "minimal" ? "Simple and sharp" : "Warm neutral"}</small></span>{selectedId === theme.id ? <Check size={18} aria-hidden="true" /> : null}</button>)}</div><div className="he-template-tip"><SlidersHorizontal size={19} /><span>Choose your actual theme inside HEYBIO after creating an account.</span></div></div><div className="he-template-stage"><div className="he-template-stage__label">PREVIEW · {selected.name.toUpperCase()}</div><div className="he-template-phone" key={selected.id} style={{ backgroundColor: selected.background, color: selected.text }}><div className="he-template-phone__brand">HEYBIO ↗</div><div className="he-template-phone__avatar" style={{ backgroundColor: isDark ? "#BDF806" : "#1D1D1F", color: isDark ? "#1D1D1F" : "#FFFFFF" }}>Y</div><h3>@yourworld</h3><p>Creator · Designer · Explorer</p><div className="he-template-phone__socials">IG &nbsp; · &nbsp; YT &nbsp; · &nbsp; WEB</div>{["My latest project", "See my work", "Let's connect"].map((link, i) => <div key={link} className="he-template-phone__link" style={{ backgroundColor: i === 0 ? "#BDF806" : isDark ? "#353537" : "#FFFFFF", color: i === 0 ? "#1D1D1F" : selected.text, borderColor: isDark ? "#4c4c4c" : "#E3E3E3" }}><span>{link}</span><ArrowUpRight size={16} aria-hidden="true" /></div>)}<small>Made with HEYBIO ↗</small></div><div className="he-template-stage__note">Illustrative profile only · No real creator data</div></div></div></div></section>
+      <section className="he-container he-section he-half"><div className="he-reveal"><Eyebrow>BUILD YOUR IDENTITY</Eyebrow><h2>Make it yours.<br /><em>Keep it recognizable.</em></h2></div><div className="he-reveal"><p className="he-body-large">Your photo, short bio and featured links do most of the talking. A good template keeps the focus on your work—not visual clutter.</p><div className="he-tip-stack"><p><span>01</span> Start with a clear profile photo.</p><p><span>02</span> Put your best destination first.</p><p><span>03</span> Choose a style that fits your personality.</p></div></div></section>
+      <ClosingCTA title="A page that looks like you." description="Start with your username, then make the details your own." />
+    </EditorialLayout>
   );
 }
