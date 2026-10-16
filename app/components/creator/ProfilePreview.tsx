@@ -1,12 +1,21 @@
 
 import {
+  useEffect,
+  useRef,
+} from "react";
+
+import {
   ArrowUpRight,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 
 import type {
-  ProfileTheme
+  ProfileTheme,
 } from "./ThemePicker";
+
+import {
+  readCookiePreferences,
+} from "../shared/CookieConsent";
 
 export type PublicLink = {
   id: string;
@@ -30,45 +39,173 @@ type ProfilePreviewProps = {
 
 const THEME_COLORS: Record<
   ProfileTheme["preset"],
-  { background: string; text: string }
+  {
+    background: string;
+    text: string;
+  }
 > = {
   classic: {
     background: "#F9F9F6",
-    text: "#1A1B19"
+    text: "#1A1B19",
   },
+
   midnight: {
     background: "#171817",
-    text: "#FFFFFF"
+    text: "#FFFFFF",
   },
+
   ice: {
     background: "#D9EEFF",
-    text: "#152A40"
+    text: "#152A40",
   },
+
   peach: {
     background: "#FFE0D5",
-    text: "#3D2520"
+    text: "#3D2520",
   },
+
   lavender: {
     background: "#EDE3FF",
-    text: "#302044"
+    text: "#302044",
   },
+
   minimal: {
     background: "#FFFFFF",
-    text: "#161616"
-  }
+    text: "#161616",
+  },
 };
+
+/**
+ * Track only genuine public profile routes.
+ *
+ * Dashboard previews and marketing examples
+ * must never inflate public analytics.
+ */
+function onPublicProfile(
+  username: string,
+): boolean {
+  if (
+    typeof window === "undefined"
+  ) {
+    return false;
+  }
+
+  return (
+    window.location.pathname.replace(
+      /\/$/,
+      "",
+    ) ===
+    `/${encodeURIComponent(username)}`
+  );
+}
+
+/**
+ * Send an optional analytics event.
+ *
+ * Never block link navigation.
+ * Never put the destination URL in the payload.
+ */
+function emitAnalytics(
+  username: string,
+  event:
+    | "profile_view"
+    | "link_click",
+  linkId: string | null = null,
+): void {
+  if (
+    !onPublicProfile(username) ||
+    readCookiePreferences()?.analytics !== true
+  ) {
+    return;
+  }
+
+  void fetch(
+    "/api/analytics",
+    {
+      method: "POST",
+      credentials: "omit",
+
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+
+      keepalive: true,
+
+      body: JSON.stringify({
+        username,
+        event,
+        linkId,
+      }),
+    },
+  ).catch(() => undefined);
+}
 
 export default function ProfilePreview({
   profile,
-  compact = false
+  compact = false,
 }: ProfilePreviewProps) {
+  const viewSent =
+    useRef(false);
+
+  useEffect(() => {
+    viewSent.current = false;
+
+    const sendIfConsented = () => {
+      if (
+        viewSent.current ||
+        !onPublicProfile(
+          profile.username,
+        )
+      ) {
+        return;
+      }
+
+      if (
+        readCookiePreferences()
+          ?.analytics !== true
+      ) {
+        return;
+      }
+
+      viewSent.current = true;
+
+      emitAnalytics(
+        profile.username,
+        "profile_view",
+      );
+    };
+
+    // Previously granted consent.
+    sendIfConsented();
+
+    // Visitor grants consent after opening
+    // the page: record at most one page-view
+    // event for this mounted profile.
+    window.addEventListener(
+      "heybio:consent",
+      sendIfConsented,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "heybio:consent",
+        sendIfConsented,
+      );
+    };
+  }, [profile.username]);
+
   const colors =
-    THEME_COLORS[profile.theme.preset];
+    THEME_COLORS[
+      profile.theme.preset
+    ];
 
   const buttonRadius =
-    profile.theme.buttonStyle === "pill"
+    profile.theme.buttonStyle ===
+    "pill"
       ? "999px"
-      : profile.theme.buttonStyle === "square"
+      : profile.theme.buttonStyle ===
+          "square"
         ? "5px"
         : "16px";
 
@@ -79,21 +216,32 @@ export default function ProfilePreview({
   return (
     <div
       className={`public-profile ${
-        compact ? "public-profile--compact" : ""
+        compact
+          ? "public-profile--compact"
+          : ""
       }`}
       style={
         {
-          "--profile-bg": colors.background,
-          "--profile-text": colors.text,
-          "--profile-accent": profile.theme.accent,
-          "--profile-button-radius": buttonRadius
+          "--profile-bg":
+            colors.background,
+
+          "--profile-text":
+            colors.text,
+
+          "--profile-accent":
+            profile.theme.accent,
+
+          "--profile-button-radius":
+            buttonRadius,
         } as React.CSSProperties
       }
     >
       <div className="public-profile__inner">
         <div className="public-profile__avatar">
           <span aria-hidden="true">
-            {displayName.charAt(0).toUpperCase()}
+            {displayName
+              .charAt(0)
+              .toUpperCase()}
           </span>
         </div>
 
@@ -110,39 +258,55 @@ export default function ProfilePreview({
         )}
 
         <div className="public-profile__links">
-          {profile.links.map((link) => (
-            <a
-              key={link.id}
-              className="public-profile__link"
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer nofollow ugc"
-            >
-              <span className="public-profile__link-icon">
-                <ExternalLink size={18} />
-              </span>
+          {profile.links.map(
+            (link) => (
+              <a
+                key={link.id}
+                className="public-profile__link"
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer nofollow ugc"
+                onClick={() =>
+                  emitAnalytics(
+                    profile.username,
+                    "link_click",
+                    link.id,
+                  )
+                }
+              >
+                <span className="public-profile__link-icon">
+                  <ExternalLink
+                    size={18}
+                    aria-hidden="true"
+                  />
+                </span>
 
-              <span className="public-profile__link-copy">
-                <strong>{link.title}</strong>
+                <span className="public-profile__link-copy">
+                  <strong>
+                    {link.title}
+                  </strong>
 
-                {link.description && (
-                  <small>
-                    {link.description}
-                  </small>
-                )}
-              </span>
+                  {link.description && (
+                    <small>
+                      {link.description}
+                    </small>
+                  )}
+                </span>
 
-              <ArrowUpRight
-                size={19}
-                aria-hidden="true"
-              />
-            </a>
-          ))}
+                <ArrowUpRight
+                  size={19}
+                  aria-hidden="true"
+                />
+              </a>
+            ),
+          )}
         </div>
 
-        {profile.links.length === 0 && (
+        {profile.links.length ===
+          0 && (
           <p className="public-profile__empty">
-            This creator hasn't added any public links yet.
+            This creator hasn't added
+            any public links yet.
           </p>
         )}
 
@@ -151,7 +315,10 @@ export default function ProfilePreview({
           href="/"
           aria-label="Visit HEYBIO"
         >
-          Made with <strong>HEYBIO ↗</strong>
+          Made with{" "}
+          <strong>
+            HEYBIO ↗
+          </strong>
         </a>
       </div>
     </div>

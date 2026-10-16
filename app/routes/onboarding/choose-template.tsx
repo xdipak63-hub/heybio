@@ -1,6 +1,7 @@
 
 import {
   Form,
+  Link,
   data,
   redirect,
   useActionData,
@@ -11,11 +12,14 @@ import {
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
+  MetaFunction,
 } from "react-router";
 
 import {
-  Check,
+  ArrowLeft,
   ArrowRight,
+  Check,
+  LockKeyhole,
 } from "lucide-react";
 
 import {
@@ -27,22 +31,26 @@ import {
 } from "../../lib/supabase/server";
 
 import {
+  getVerifiedFeatureAccess,
+} from "../../lib/creator/access.server";
+
+import {
   THEME_PRESETS,
 } from "../../components/creator/ThemePicker";
 
-const allowed = new Set<string>(
-  THEME_PRESETS.map((theme) => theme.id),
+const DEFAULT_PRESET = "classic";
+
+const VALID_PRESETS = new Set<string>(
+  THEME_PRESETS.map((item) => item.id),
 );
 
-export function meta() {
-  return [
-    { title: "Choose a template — HEYBIO" },
-    {
-      name: "robots",
-      content: "noindex, nofollow",
-    },
-  ];
-}
+export const meta: MetaFunction = () => [
+  { title: "Choose your look — HEYBIO" },
+  {
+    name: "robots",
+    content: "noindex, nofollow",
+  },
+];
 
 export async function loader({
   request,
@@ -51,7 +59,7 @@ export async function loader({
   const { user, client } =
     await requireUser(request, context);
 
-  const [profileResult, themeResult] =
+  const [profile, storedTheme] =
     await Promise.all([
       client.supabase
         .from("profiles")
@@ -66,12 +74,9 @@ export async function loader({
         .maybeSingle(),
     ]);
 
-  if (
-    profileResult.error ||
-    themeResult.error
-  ) {
+  if (profile.error || storedTheme.error) {
     throw new Response(
-      "Unable to load templates.",
+      "Unable to load your templates.",
       {
         status: 503,
         headers: client.headers,
@@ -79,19 +84,52 @@ export async function loader({
     );
   }
 
-  if (!profileResult.data?.username) {
+  if (!profile.data?.username) {
     throw redirect(
       "/onboarding/choose-username",
-      { headers: client.headers },
+      {
+        headers: client.headers,
+      },
     );
   }
 
+  let customThemes = false;
+
+  try {
+    customThemes = (
+      await getVerifiedFeatureAccess(
+        context,
+        client.supabase,
+        user.id,
+        "custom_themes",
+      )
+    ).allowed;
+  } catch {
+    throw new Response(
+      "Plan verification is temporarily unavailable.",
+      {
+        status: 503,
+        headers: client.headers,
+      },
+    );
+  }
+
+  const stored =
+    storedTheme.data?.preset ??
+    DEFAULT_PRESET;
+
   return data(
     {
+      customThemes,
       selected:
-        themeResult.data?.preset ?? "classic",
+        customThemes &&
+        VALID_PRESETS.has(stored)
+          ? stored
+          : DEFAULT_PRESET,
     },
-    { headers: client.headers },
+    {
+      headers: client.headers,
+    },
   );
 }
 
@@ -105,13 +143,16 @@ export async function action({
     await requireUser(request, context);
 
   const form = await request.formData();
+
   const preset = String(
     form.get("preset") ?? "",
   );
 
-  if (!allowed.has(preset)) {
+  if (!VALID_PRESETS.has(preset)) {
     return data(
-      { error: "Select a valid template." },
+      {
+        error: "Choose a valid template.",
+      },
       {
         status: 400,
         headers: client.headers,
@@ -119,6 +160,47 @@ export async function action({
     );
   }
 
+  let customThemes = false;
+
+  try {
+    customThemes = (
+      await getVerifiedFeatureAccess(
+        context,
+        client.supabase,
+        user.id,
+        "custom_themes",
+      )
+    ).allowed;
+  } catch {
+    return data(
+      {
+        error:
+          "Could not verify your plan. Please try again.",
+      },
+      {
+        status: 503,
+        headers: client.headers,
+      },
+    );
+  }
+
+  if (
+    preset !== DEFAULT_PRESET &&
+    !customThemes
+  ) {
+    return data(
+      {
+        error:
+          "Custom templates require an active eligible plan.",
+      },
+      {
+        status: 403,
+        headers: client.headers,
+      },
+    );
+  }
+
+  // Phase 02 RLS is the final DB authorization boundary.
   const { error } = await client.supabase
     .from("profile_themes")
     .upsert(
@@ -128,14 +210,16 @@ export async function action({
         accent: "#BDF806",
         button_style: "rounded",
       },
-      { onConflict: "profile_id" },
+      {
+        onConflict: "profile_id",
+      },
     );
 
   if (error) {
     return data(
       {
         error:
-          "Template could not be saved. Please try again.",
+          "We couldn't save your look. Try again.",
       },
       {
         status: 503,
@@ -146,190 +230,241 @@ export async function action({
 
   throw redirect(
     "/onboarding/complete",
-    { headers: client.headers },
+    {
+      headers: client.headers,
+    },
   );
 }
 
 export default function ChooseTemplatePage() {
-  const { selected } =
+  const { customThemes, selected } =
     useLoaderData<typeof loader>();
 
-  const actionData =
+  const response =
     useActionData<typeof action>();
 
   const navigation = useNavigation();
 
+  const saving =
+    navigation.state === "submitting";
+
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        padding: "60px 20px",
-        background: "#F5F5F7",
-      }}
-    >
+    <main className="hb-workspace">
       <div
-        style={{
-          maxWidth: 960,
-          margin: "0 auto",
-        }}
+        className="hb-workspace__container"
+        style={{ maxWidth: 1020 }}
       >
-        <a
-          href="/"
+        <Link
+          className="hb-workspace__back"
+          to="/onboarding/create-profile"
+        >
+          <ArrowLeft
+            size={17}
+            aria-hidden="true"
+          />
+          Back to profile
+        </Link>
+
+        <header className="hb-workspace__heading">
+          <div>
+            <span className="hb-workspace__eyebrow">
+              CREATOR SETUP / APPEARANCE
+            </span>
+
+            <h1>Choose your look.</h1>
+
+            <p>
+              Your page starts simple. Change its
+              style whenever you're ready.
+            </p>
+          </div>
+        </header>
+
+        {!customThemes && (
+          <div
+            className="hb-workspace__note"
+            role="note"
+          >
+            <LockKeyhole
+              size={19}
+              aria-hidden="true"
+            />
+
+            <span>
+              Classic is included with Free.
+              Custom templates unlock with an
+              active paid plan.{" "}
+              <Link to="/pricing">
+                Compare plans
+              </Link>.
+            </span>
+          </div>
+        )}
+
+        <Form
+          method="post"
           style={{
-            fontSize: 28,
-            fontWeight: 900,
-            color: "#1D1D1F",
-            textDecoration: "none",
+            display: "grid",
+            gap: 22,
           }}
         >
-          HEYBIO↗
-        </a>
-
-        <p
-          style={{
-            marginTop: 48,
-            fontSize: 12,
-            fontWeight: 800,
-            letterSpacing: 2,
-          }}
-        >
-          CREATOR SETUP / 02
-        </p>
-
-        <h1
-          style={{
-            fontSize: "clamp(36px,6vw,64px)",
-            letterSpacing: "-.06em",
-            marginBottom: 10,
-          }}
-        >
-          Choose your look.
-        </h1>
-
-        <p style={{ color: "#666" }}>
-          Your profile. Your personality.
-          You can change this later.
-        </p>
-
-        <Form method="post">
-          {actionData?.error && (
-            <p role="alert" style={{ color: "#B42318" }}>
-              {actionData.error}
+          {response?.error && (
+            <p
+              role="alert"
+              className="auth-error"
+            >
+              {response.error}
             </p>
           )}
 
-          <div
+          <fieldset
             style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit,minmax(210px,1fr))",
-              gap: 18,
-              marginTop: 36,
+              border: 0,
+              padding: 0,
+              margin: 0,
             }}
           >
-            {THEME_PRESETS.map((theme) => (
-              <label
-                key={theme.id}
-                style={{
-                  display: "block",
-                  cursor: "pointer",
-                }}
-              >
-                <input
-                  type="radio"
-                  name="preset"
-                  value={theme.id}
-                  defaultChecked={
-                    theme.id === selected
-                  }
-                  required
-                  style={{ marginBottom: 12 }}
-                />
+            <legend
+              style={{
+                fontWeight: 750,
+                marginBottom: 18,
+              }}
+            >
+              Select a template
+            </legend>
 
-                <div
-                  style={{
-                    background: theme.background,
-                    color: theme.text,
-                    minHeight: 250,
-                    borderRadius: 24,
-                    padding: 24,
-                    display: "grid",
-                    alignContent: "center",
-                    justifyItems: "center",
-                    gap: 18,
-                    border:
-                      "1px solid rgba(0,0,0,.1)",
-                  }}
-                >
-                  <div
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(auto-fit, minmax(min(100%, 225px), 1fr))",
+                gap: 14,
+              }}
+            >
+              {THEME_PRESETS.map((theme) => {
+                const locked =
+                  !customThemes &&
+                  theme.id !== DEFAULT_PRESET;
+
+                const checked =
+                  selected === theme.id;
+
+                return (
+                  <label
+                    key={theme.id}
                     style={{
-                      width: 58,
-                      height: 58,
-                      borderRadius: "50%",
-                      background: "#BDF806",
                       display: "grid",
-                      placeItems: "center",
-                      color: "#171817",
-                      fontWeight: 900,
+                      gap: 12,
+                      cursor: locked
+                        ? "not-allowed"
+                        : "pointer",
+                      padding: 18,
+                      borderRadius: 20,
+                      border: checked
+                        ? "2px solid #1D1D1F"
+                        : "1px solid #DEDEE3",
+                      background: "#FFF",
+                      opacity: locked ? 0.62 : 1,
                     }}
                   >
-                    H
-                  </div>
-
-                  <strong>@yourname</strong>
-
-                  {[1, 2].map((item) => (
-                    <div
-                      key={item}
+                    <span
                       style={{
-                        width: "100%",
-                        height: 38,
-                        borderRadius: 12,
-                        border:
-                          "1px solid currentColor",
-                        opacity: 0.55,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent:
+                          "space-between",
+                      }}
+                    >
+                      <strong>{theme.name}</strong>
+
+                      {locked ? (
+                        <LockKeyhole
+                          size={17}
+                          aria-label="Paid template"
+                        />
+                      ) : checked ? (
+                        <Check
+                          size={18}
+                          aria-hidden="true"
+                        />
+                      ) : null}
+                    </span>
+
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        display: "grid",
+                        gap: 9,
+                        padding: 22,
+                        borderRadius: 14,
+                        background:
+                          theme.background,
+                        color: theme.text,
+                      }}
+                    >
+                      <span
+                        style={{
+                          margin: "auto",
+                          width: 34,
+                          height: 34,
+                          borderRadius: "50%",
+                          background: "currentColor",
+                          opacity: 0.2,
+                        }}
+                      />
+
+                      <span
+                        style={{
+                          height: 12,
+                          borderRadius: 20,
+                          background: "currentColor",
+                          opacity: 0.3,
+                        }}
+                      />
+
+                      <span
+                        style={{
+                          height: 12,
+                          borderRadius: 20,
+                          background: "currentColor",
+                          opacity: 0.3,
+                        }}
+                      />
+                    </span>
+
+                    <input
+                      type="radio"
+                      name="preset"
+                      value={theme.id}
+                      defaultChecked={checked}
+                      disabled={locked}
+                      required={!locked}
+                      style={{
+                        accentColor: "#1D1D1F",
                       }}
                     />
-                  ))}
-                </div>
-
-                <p
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    fontWeight: 800,
-                  }}
-                >
-                  <Check size={16} />
-                  {theme.name}
-                </p>
-              </label>
-            ))}
-          </div>
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
 
           <button
+            className="hb-workspace__button hb-workspace__button--primary"
             type="submit"
-            disabled={
-              navigation.state === "submitting"
-            }
+            disabled={saving}
             style={{
-              marginTop: 28,
-              padding: "16px 28px",
-              border: 0,
-              borderRadius: 100,
-              background: "#BDF806",
-              fontWeight: 800,
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 10,
+              justifySelf: "start",
             }}
           >
-            {navigation.state === "submitting"
-              ? "Saving..."
-              : "Finish setup"}
-            <ArrowRight size={18} />
+            {saving
+              ? "Saving…"
+              : "Continue"}
+
+            <ArrowRight
+              size={17}
+              aria-hidden="true"
+            />
           </button>
         </Form>
       </div>

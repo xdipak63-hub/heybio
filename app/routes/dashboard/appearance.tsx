@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+
 import {
   Form,
   Link,
@@ -7,133 +8,204 @@ import {
   redirect,
   useActionData,
   useLoaderData,
-  useNavigation
+  useNavigation,
 } from "react-router";
 
 import type {
   ActionFunctionArgs,
-  LoaderFunctionArgs
+  LoaderFunctionArgs,
+  MetaFunction,
 } from "react-router";
+
+import {
+  LockKeyhole,
+  Save,
+} from "lucide-react";
 
 import ThemePicker, {
   ACCENT_COLORS,
   BUTTON_STYLES,
-  THEME_PRESETS
+  THEME_PRESETS,
+  type ProfileTheme,
 } from "../../components/creator/ThemePicker";
 
-import type {
-  ProfileTheme
-} from "../../components/creator/ThemePicker";
-
-import ProfilePreview from "../../components/creator/ProfilePreview";
-
-import type {
-  PublicLink
+import ProfilePreview, {
+  type PublicLink,
 } from "../../components/creator/ProfilePreview";
 
 import {
-  requireUser
+  requireUser,
 } from "../../lib/auth/require-user.server";
 
 import {
-  requireSameOrigin
+  requireSameOrigin,
 } from "../../lib/supabase/server";
+
+import {
+  getVerifiedFeatureAccess,
+} from "../../lib/creator/access.server";
 
 const DEFAULT_THEME: ProfileTheme = {
   preset: "classic",
   accent: "#BDF806",
-  buttonStyle: "rounded"
+  buttonStyle: "rounded",
 };
 
-export function meta() {
-  return [
-    { title: "Appearance — HEYBIO" },
-    {
-      name: "robots",
-      content: "noindex, nofollow"
-    }
-  ];
-}
+const isDefault = (theme: ProfileTheme) =>
+  theme.preset === DEFAULT_THEME.preset &&
+  theme.accent === DEFAULT_THEME.accent &&
+  theme.buttonStyle === DEFAULT_THEME.buttonStyle;
+
+export const meta: MetaFunction = () => [
+  {
+    title: "Appearance — HEYBIO",
+  },
+  {
+    name: "robots",
+    content: "noindex, nofollow",
+  },
+];
 
 export async function loader({
   request,
-  context
+  context,
 }: LoaderFunctionArgs) {
   const { user, client } =
     await requireUser(request, context);
 
-  const [profileResult, themeResult, linksResult] =
-    await Promise.all([
-      client.supabase
-        .from("profiles")
-        .select("username,display_name,bio")
-        .eq("id", user.id)
-        .maybeSingle(),
+  const [
+    profile,
+    themeRow,
+    linksResult,
+  ] = await Promise.all([
+    client.supabase
+      .from("profiles")
+      .select("username,display_name,bio")
+      .eq("id", user.id)
+      .maybeSingle(),
 
-      client.supabase
-        .from("profile_themes")
-        .select("preset,accent,button_style")
-        .eq("profile_id", user.id)
-        .maybeSingle(),
+    client.supabase
+      .from("profile_themes")
+      .select("preset,accent,button_style")
+      .eq("profile_id", user.id)
+      .maybeSingle(),
 
-      client.supabase
-        .from("links")
-        .select("id,title,url,description")
-        .eq("profile_id", user.id)
-        .eq("is_active", true)
-        .order("position")
-        .order("created_at")
-    ]);
+    client.supabase
+      .from("links")
+      .select("id,title,url,description")
+      .eq("profile_id", user.id)
+      .eq("is_active", true)
+      .order("position")
+      .order("created_at"),
+  ]);
 
   if (
-    profileResult.error ||
-    themeResult.error ||
+    profile.error ||
+    themeRow.error ||
     linksResult.error
   ) {
     throw new Response(
       "Unable to load appearance settings.",
       {
         status: 503,
-        headers: client.headers
-      }
+        headers: client.headers,
+      },
     );
   }
 
-  const profile = profileResult.data;
-
-  if (!profile?.username) {
+  if (!profile.data?.username) {
     throw redirect(
       "/onboarding/choose-username",
-      { headers: client.headers }
+      {
+        headers: client.headers,
+      },
     );
   }
 
-  const storedTheme = themeResult.data;
+  let customThemes = false;
 
-  const theme: ProfileTheme = storedTheme
-    ? {
-        preset: storedTheme.preset,
-        accent: storedTheme.accent,
-        buttonStyle: storedTheme.button_style
-      }
+  try {
+    customThemes = (
+      await getVerifiedFeatureAccess(
+        context,
+        client.supabase,
+        user.id,
+        "custom_themes",
+      )
+    ).allowed;
+  } catch {
+    throw new Response(
+      "Plan verification is temporarily unavailable.",
+      {
+        status: 503,
+        headers: client.headers,
+      },
+    );
+  }
+
+  const stored = themeRow.data;
+
+  const validPreset =
+    THEME_PRESETS.find(
+      (t) => t.id === stored?.preset,
+    )?.id;
+
+  const validAccent =
+    ACCENT_COLORS.find(
+      (c) => c === stored?.accent,
+    );
+
+  const validButton =
+    BUTTON_STYLES.find(
+      (b) => b.id === stored?.button_style,
+    )?.id;
+
+  const original: ProfileTheme = {
+    preset:
+      validPreset ?? DEFAULT_THEME.preset,
+    accent:
+      validAccent ?? DEFAULT_THEME.accent,
+    buttonStyle:
+      validButton ??
+      DEFAULT_THEME.buttonStyle,
+  };
+
+  const theme = customThemes
+    ? original
     : DEFAULT_THEME;
+
+  const links: PublicLink[] =
+    (linksResult.data ?? []).map((item) => ({
+      id: item.id,
+      title: item.title,
+      url: item.url,
+      description:
+        item.description ?? "",
+    }));
 
   return data(
     {
-      username: profile.username,
-      displayName: profile.display_name ?? "",
-      bio: profile.bio ?? "",
+      username: profile.data.username,
+      displayName:
+        profile.data.display_name ?? "",
+      bio:
+        profile.data.bio ?? "",
       theme,
-      links:
-        (linksResult.data ?? []) as PublicLink[]
+      customThemes,
+      links,
+      saved:
+        new URL(request.url)
+          .searchParams.get("saved") === "1",
     },
-    { headers: client.headers }
+    {
+      headers: client.headers,
+    },
   );
 }
 
 export async function action({
   request,
-  context
+  context,
 }: ActionFunctionArgs) {
   requireSameOrigin(request);
 
@@ -143,116 +215,166 @@ export async function action({
   const form = await request.formData();
 
   const displayName = String(
-    form.get("displayName") ?? ""
+    form.get("displayName") ?? "",
   ).trim();
 
   const bio = String(
-    form.get("bio") ?? ""
+    form.get("bio") ?? "",
   ).trim();
 
   const preset = String(
-    form.get("preset") ?? ""
+    form.get("preset") ?? "",
   );
 
   const accent = String(
-    form.get("accent") ?? ""
+    form.get("accent") ?? "",
   );
 
   const buttonStyle = String(
-    form.get("buttonStyle") ?? ""
+    form.get("buttonStyle") ?? "",
   );
 
-  function invalid(error: string) {
-    return data(
-      { error },
+  const invalid = (
+    message: string,
+    status = 400,
+  ) =>
+    data(
+      { error: message },
       {
-        status: 400,
-        headers: client.headers
-      }
+        status,
+        headers: client.headers,
+      },
     );
-  }
 
   if (
     displayName.length > 80 ||
     bio.length > 500
   ) {
     return invalid(
-      "Display name must be at most 80 characters and bio at most 500 characters."
+      "Display name must be 80 characters or fewer, and bio 500 or fewer.",
+    );
+  }
+
+  const validPreset =
+    THEME_PRESETS.find(
+      (item) => item.id === preset,
+    )?.id;
+
+  const validAccent =
+    ACCENT_COLORS.find(
+      (item) => item === accent,
+    );
+
+  const validButton =
+    BUTTON_STYLES.find(
+      (item) => item.id === buttonStyle,
+    )?.id;
+
+  if (
+    !validPreset ||
+    !validAccent ||
+    !validButton
+  ) {
+    return invalid(
+      "Choose a valid theme.",
+    );
+  }
+
+  const theme: ProfileTheme = {
+    preset: validPreset,
+    accent: validAccent,
+    buttonStyle: validButton,
+  };
+
+  let customThemes = false;
+
+  try {
+    customThemes = (
+      await getVerifiedFeatureAccess(
+        context,
+        client.supabase,
+        user.id,
+        "custom_themes",
+      )
+    ).allowed;
+  } catch {
+    return invalid(
+      "Could not verify plan access. Please retry.",
+      503,
     );
   }
 
   if (
-    !THEME_PRESETS.some((t) => t.id === preset) ||
-    !ACCENT_COLORS.some((c) => c === accent) ||
-    !BUTTON_STYLES.some((b) => b.id === buttonStyle)
+    !customThemes &&
+    !isDefault(theme)
   ) {
-    return invalid("Invalid theme selection.");
+    return invalid(
+      "An active paid plan is required for this theme.",
+      403,
+    );
   }
 
-  const { data: updated, error: profileError } =
-    await client.supabase
-      .from("profiles")
-      .update({
-        display_name: displayName,
-        bio
-      })
-      .eq("id", user.id)
-      .select("id")
-      .maybeSingle();
+  // Only modify fields belonging to this user.
+  const {
+    data: updated,
+    error: profileError,
+  } = await client.supabase
+    .from("profiles")
+    .update({
+      display_name: displayName,
+      bio,
+    })
+    .eq("id", user.id)
+    .select("id")
+    .maybeSingle();
 
   if (profileError || !updated) {
     return invalid(
-      "Unable to save profile details."
+      "Couldn't save profile details.",
+      503,
     );
   }
 
-  const { data: existingTheme, error: readError } =
-    await client.supabase
-      .from("profile_themes")
-      .select("profile_id")
-      .eq("profile_id", user.id)
-      .maybeSingle();
-
-  if (readError) {
-    return invalid(
-      "Unable to save theme settings."
+  const {
+    error: themeError,
+  } = await client.supabase
+    .from("profile_themes")
+    .upsert(
+      {
+        profile_id: user.id,
+        preset: theme.preset,
+        accent: theme.accent,
+        button_style: theme.buttonStyle,
+      },
+      {
+        onConflict: "profile_id",
+      },
     );
-  }
 
-  const themeValues = {
-    preset,
-    accent,
-    button_style: buttonStyle
-  };
-
-  const themeResult = existingTheme
-    ? await client.supabase
-        .from("profile_themes")
-        .update(themeValues)
-        .eq("profile_id", user.id)
-    : await client.supabase
-        .from("profile_themes")
-        .insert({
-          profile_id: user.id,
-          ...themeValues
-        });
-
-  if (themeResult.error) {
+  if (themeError) {
     return invalid(
-      "Profile updated, but theme save failed. Please retry."
+      "Profile details were saved, but theme could not be saved. Please retry.",
+      503,
     );
   }
 
   throw redirect(
     "/dashboard/appearance?saved=1",
-    { headers: client.headers }
+    {
+      headers: client.headers,
+    },
   );
 }
 
 export default function DashboardAppearance() {
-  const initial = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
-  const navigation = useNavigation();
+  const initial =
+    useLoaderData<typeof loader>();
+
+  const response =
+    useActionData<typeof action>();
+
+  const navigation =
+    useNavigation();
 
   const [displayName, setDisplayName] =
     useState(initial.displayName);
@@ -263,24 +385,37 @@ export default function DashboardAppearance() {
   const [theme, setTheme] =
     useState<ProfileTheme>(initial.theme);
 
-  const saving = navigation.state === "submitting";
+  const saving =
+    navigation.state === "submitting";
 
   return (
     <main className="studio-page">
       <header className="studio-header">
         <Link className="brand" to="/">
           HEYBIO
-          <span className="brand-arrow">↗</span>
+          <span className="brand-arrow">
+            ↗
+          </span>
         </Link>
 
         <nav aria-label="Creator navigation">
-          <Link to="/dashboard">Overview</Link>
-          <Link to="/dashboard/links">Links</Link>
+          <Link to="/dashboard">
+            Overview
+          </Link>
+
+          <Link to="/dashboard/links">
+            Links
+          </Link>
+
           <Link
             to="/dashboard/appearance"
             aria-current="page"
           >
             Appearance
+          </Link>
+
+          <Link to="/dashboard/billing">
+            Billing
           </Link>
         </nav>
       </header>
@@ -288,19 +423,53 @@ export default function DashboardAppearance() {
       <div className="studio-container">
         <div className="studio-page-heading">
           <span className="eyebrow">
-            PERSONALIZE YOUR SPACE
+            YOUR CREATOR SPACE
           </span>
 
           <h1>Make it yours.</h1>
 
           <p>
-            Your profile, your identity, your aesthetic.
+            Shape your page. Every update comes
+            from your saved profile.
           </p>
         </div>
 
-        {actionData?.error && (
-          <div className="auth-error" role="alert">
-            {actionData.error}
+        {initial.saved && (
+          <p
+            role="status"
+            className="hb-workspace__status"
+          >
+            Your changes were saved.
+          </p>
+        )}
+
+        {response?.error && (
+          <p
+            role="alert"
+            className="auth-error"
+          >
+            {response.error}
+          </p>
+        )}
+
+        {!initial.customThemes && (
+          <div
+            role="note"
+            className="hb-workspace__note"
+          >
+            <LockKeyhole
+              size={19}
+              aria-hidden="true"
+            />
+
+            <span>
+              You're using the included Classic
+              design. Custom themes require a
+              verified paid plan.{" "}
+              <Link to="/pricing">
+                Compare plans
+              </Link>.
+            </span>
           </div>
         )}
 
@@ -309,48 +478,63 @@ export default function DashboardAppearance() {
             method="post"
             className="appearance-editor"
           >
-            <div className="appearance-panel">
+            <section className="appearance-panel">
               <h2>Profile details</h2>
 
               <label>
                 Display name
+
                 <input
                   name="displayName"
+                  maxLength={80}
                   value={displayName}
                   onChange={(event) =>
-                    setDisplayName(event.target.value)
+                    setDisplayName(
+                      event.target.value,
+                    )
                   }
-                  maxLength={80}
                   placeholder="Your name"
                 />
               </label>
 
               <label>
                 Bio
+
                 <textarea
                   name="bio"
-                  value={bio}
-                  onChange={(event) =>
-                    setBio(event.target.value)
-                  }
                   maxLength={500}
                   rows={4}
-                  placeholder="Tell your story..."
+                  value={bio}
+                  onChange={(event) =>
+                    setBio(
+                      event.target.value,
+                    )
+                  }
+                  placeholder="Introduce yourself…"
                 />
               </label>
 
               <p className="appearance-character-count">
                 {bio.length} / 500 characters
               </p>
-            </div>
+            </section>
 
-            <div className="appearance-panel">
+            <section className="appearance-panel">
               <h2>Profile theme</h2>
 
-              <ThemePicker
-                value={theme}
-                onChange={setTheme}
-              />
+              {initial.customThemes ? (
+                <ThemePicker
+                  value={theme}
+                  onChange={setTheme}
+                />
+              ) : (
+                <p>
+                  The Classic theme is included
+                  with your current plan.
+                  Upgrading gives you more
+                  appearance options.
+                </p>
+              )}
 
               <input
                 type="hidden"
@@ -369,23 +553,28 @@ export default function DashboardAppearance() {
                 name="buttonStyle"
                 value={theme.buttonStyle}
               />
-            </div>
+            </section>
 
             <button
               type="submit"
               className="button button--dark appearance-save"
               disabled={saving}
             >
+              <Save
+                size={18}
+                aria-hidden="true"
+              />
+
               {saving
-                ? "Saving profile..."
-                : "Save appearance ↗"}
+                ? "Saving…"
+                : "Save changes"}
             </button>
           </Form>
 
           <aside className="appearance-preview">
             <div className="appearance-preview__heading">
-              <strong>Live Preview</strong>
-              <span>YOUR PROFILE</span>
+              <strong>Live preview</strong>
+              <span>UNSAVED CHANGES</span>
             </div>
 
             <div className="appearance-preview__frame">
@@ -396,14 +585,16 @@ export default function DashboardAppearance() {
                   displayName,
                   bio,
                   theme,
-                  links: initial.links
+                  links: initial.links,
                 }}
               />
             </div>
 
             <Link
               className="appearance-preview__open"
-              to={`/${initial.username}`}
+              to={`/${encodeURIComponent(
+                initial.username,
+              )}`}
               target="_blank"
               rel="noopener noreferrer"
             >
