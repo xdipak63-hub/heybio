@@ -28,6 +28,25 @@ export interface RazorpayPayment {
   subscription_id?: string | null;
   captured: boolean;
   created_at: number;
+  method?: string | null;
+}
+
+export interface RazorpayPlan {
+  id: string;
+  entity: "plan";
+  interval: number;
+  period: string;
+  item: { amount: number; currency: string };
+}
+
+export interface RazorpayOrder {
+  id: string;
+  entity: "order";
+  amount: number;
+  amount_paid: number;
+  currency: string;
+  status: string;
+  receipt: string;
 }
 
 export interface CreateSubscriptionInput {
@@ -95,6 +114,32 @@ export class RazorpayClient {
     }
 
     return await response.json() as T;
+  }
+
+  async createOrder(input: {
+    amountPaise: number;
+    receipt: string;
+    notes: Record<string, string>;
+  }): Promise<RazorpayOrder> {
+    if (!Number.isSafeInteger(input.amountPaise) || input.amountPaise < 100 ||
+        !/^[a-zA-Z0-9_-]{1,40}$/.test(input.receipt)) {
+      throw new Error("Invalid order request");
+    }
+    return this.request<RazorpayOrder>("/orders", {
+      method: "POST",
+      body: { amount: input.amountPaise, currency: "INR", receipt: input.receipt,
+        partial_payment: false, notes: input.notes }
+    });
+  }
+
+  async getPlan(planId: string): Promise<RazorpayPlan> {
+    if (!/^plan_[A-Za-z0-9]+$/.test(planId)) throw new Error("Invalid plan ID");
+    return this.request<RazorpayPlan>(`/plans/${planId}`);
+  }
+
+  async getOrder(orderId: string): Promise<RazorpayOrder> {
+    if (!/^order_[A-Za-z0-9]+$/.test(orderId)) throw new Error("Invalid order ID");
+    return this.request<RazorpayOrder>(`/orders/${orderId}`);
   }
 
   async getSubscription(

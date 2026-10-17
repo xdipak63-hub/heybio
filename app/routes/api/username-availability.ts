@@ -21,14 +21,13 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
   if (!PATTERN.test(name) || BLOCKED.has(name)) return respond(false, "This username cannot be used.", 400);
 
-  // Reuse the Cloudflare rate-limiter binding when configured; local environments
-  // without the binding still allow onboarding. Configure RATE_LIMITER before launch.
+  // Require the Cloudflare rate-limiter binding; fail closed if unavailable.
   const rateBindings = (context as { cloudflare?: { env?: RateLimitBindings } }).cloudflare?.env ?? {};
   try {
     await requireRateLimit(rateBindings, {
       namespace: "username-check",
       key: request.headers.get("CF-Connecting-IP") ?? "unknown",
-      failClosed: false,
+      failClosed: true,
     });
   } catch (error) {
     if (error instanceof Response) throw error;

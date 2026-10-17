@@ -37,10 +37,30 @@ export default {
       }
     };
 
-    return requestHandler(
+    const response = await requestHandler(
       request,
       context
     );
+
+    // Apply browser protections to every response, including
+    // errors and redirects, without touching cookies or CSP.
+    const headers = new Headers(response.headers);
+    headers.set("X-Content-Type-Options", "nosniff");
+    headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    headers.set("X-Frame-Options", "DENY");
+    headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    headers.set("Cross-Origin-Resource-Policy", "same-origin");
+
+    // HSTS only on HTTPS; don't break local development.
+    if (new URL(request.url).protocol === "https:") {
+      headers.set("Strict-Transport-Security", "max-age=31536000");
+    }
+
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   },
 
   async scheduled(

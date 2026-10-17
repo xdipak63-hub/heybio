@@ -3,9 +3,8 @@ import type {
   ActionFunctionArgs
 } from "react-router";
 
-import {
-  requireUser
-} from "../../lib/auth/require-user.server";
+import { requireUser } from "../../lib/auth/require-user.server";
+import { requireRateLimit } from "../../lib/security/rate-limit.server";
 
 import {
   requireCsrfProtection,
@@ -87,6 +86,8 @@ export async function action({
 
   const { user, client } =
     await requireUser(request, context);
+  await requireRateLimit((context as { cloudflare?: { env?: unknown } }).cloudflare?.env,
+    { namespace: "avatar-upload", key: user.id });
 
   const contentType =
     request.headers.get("content-type") ?? "";
@@ -117,7 +118,28 @@ export async function action({
   let form: FormData;
 
   try {
-    form = await request.formData();
+    // Do not let chunked requests bypass the Content-Length check.
+    const reader = request.body?.getReader();
+    if (!reader) throw new Error("Missing upload body");
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_BYTES + 65536) {
+        await reader.cancel().catch(() => {});
+        return response({ error: "Upload is too large." }, 413, client.headers);
+      }
+      chunks.push(value);
+    }
+    const buffer = new Uint8Array(total);
+    let offset = 0;
+    for (const chunk of chunks) { buffer.set(chunk, offset); offset += chunk.length; }
+    const safeRequest = new Request(request.url, {
+      method: "POST", headers: { "Content-Type": contentType }, body: buffer
+    });
+    form = await safeRequest.formData();
   } catch {
     return response(
       { error: "Invalid upload request." },
@@ -209,14 +231,14 @@ export async function action({
     );
   }
 
+  let mutation = client.supabase.from("profiles")
+    .update({ avatar_path: path }).eq("id", user.id)
+    .eq("account_status", "active");
+  mutation = profile.avatar_path === null
+    ? mutation.is("avatar_path", null)
+    : mutation.eq("avatar_path", profile.avatar_path);
   const { data: updated, error: updateError } =
-    await client.supabase
-      .from("profiles")
-      .update({ avatar_path: path })
-      .eq("id", user.id)
-      .eq("account_status", "active")
-      .select("avatar_path")
-      .single();
+    await mutation.select("avatar_path").maybeSingle();
 
   if (
     updateError ||
@@ -233,6 +255,14 @@ export async function action({
       503,
       client.headers
     );
+  }
+
+  // Remove the previous avatar only after the new DB pointer is committed.
+  if (profile.avatar_path && profile.avatar_path !== path &&
+      profile.avatar_path.startsWith(`${user.id}/`)) {
+    const { error: cleanupError } = await client.supabase.storage
+      .from(BUCKET).remove([profile.avatar_path]);
+    if (cleanupError) console.warn("Prior avatar cleanup requires retry");
   }
 
   const { data: signed, error: signError } =

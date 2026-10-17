@@ -69,7 +69,7 @@ export function isPaidSubscriptionActive(
     subscription.userId !== userId ||
     subscription.verifiedByServer !== true ||
     subscription.planId === "free" ||
-    subscription.status !== "active"
+    subscription.status !== "active" && subscription.status !== "cancelled"
   ) {
     return false;
   }

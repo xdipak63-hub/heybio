@@ -1,7 +1,6 @@
 
-import type {
-  ActionFunctionArgs,
-} from "react-router";
+import type { ActionFunctionArgs } from "react-router";
+import { requireRateLimit } from "../../lib/security/rate-limit.server";
 
 import {
   requireCsrfProtection,
@@ -38,6 +37,12 @@ export async function action({
   );
 
   requireCsrfProtection(request);
+
+  const rateEnv = (context as { cloudflare?: { env?: unknown } }).cloudflare?.env;
+  await requireRateLimit(rateEnv, {
+    namespace: "analytics-event",
+    key: request.headers.get("CF-Connecting-IP") ?? "unknown",
+  });
 
   if (
     shouldSkipAnalytics(request)

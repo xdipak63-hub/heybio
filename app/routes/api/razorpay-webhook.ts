@@ -45,7 +45,27 @@ export async function action({
     );
   }
 
-  const rawBody = await request.text();
+  // Read a bounded byte stream; Content-Length may be absent or forged.
+  const reader = request.body?.getReader();
+  if (!reader) return Response.json({ error: "Empty webhook" }, { status: 400 });
+  const chunks: Uint8Array[] = [];
+  let bytes = 0;
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    bytes += value.byteLength;
+    if (bytes > 512_000) {
+      await reader.cancel().catch(() => {});
+      return Response.json({ error: "Webhook payload too large" }, { status: 413 });
+    }
+    chunks.push(value);
+  }
+  const data = new Uint8Array(bytes);
+  let offset = 0;
+  for (const chunk of chunks) { data.set(chunk, offset); offset += chunk.length; }
+  let rawBody: string;
+  try { rawBody = new TextDecoder("utf-8", { fatal: true }).decode(data); }
+  catch { return Response.json({ error: "Invalid encoding" }, { status: 400 }); }
 
   const signature = request.headers.get(
     "x-razorpay-signature"

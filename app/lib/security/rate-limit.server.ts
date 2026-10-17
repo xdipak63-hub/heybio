@@ -38,10 +38,11 @@ function normalizeRateLimitKey(
 }
 
 export async function requireRateLimit(
-  env: RateLimitBindings,
+  env: unknown,
   options: RateLimitOptions
 ): Promise<void> {
-  const limiter = env.RATE_LIMITER;
+  const limiter = env && typeof env === "object" && "RATE_LIMITER" in env
+    ? (env as RateLimitBindings).RATE_LIMITER : undefined;
 
   if (!limiter) {
     if (options.failClosed !== false) {

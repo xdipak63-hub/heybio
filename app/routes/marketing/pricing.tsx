@@ -66,7 +66,7 @@ const faqs = [
   },
   {
     q: "Will paid plans renew automatically?",
-    a: "Paid plans are designed for monthly recurring billing with your authorization. Renewal, pricing, tax and cancellation details must be confirmed at checkout before you subscribe.",
+    a: "You can choose a one-month manual payment with no automatic debit, or authorized monthly auto-renewal through Razorpay. The selected method, charges, mandate duration and cancellation terms must be clear before checkout.",
   },
   {
     q: "Which plans include HYPE DROP?",

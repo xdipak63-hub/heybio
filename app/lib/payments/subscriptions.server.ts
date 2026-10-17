@@ -73,7 +73,7 @@ export async function getBillingAccess(
       "id,plan_id,status,current_period_end"
     )
     .eq("user_id", userId)
-    .eq("status", "active")
+    .in("status", ["active", "cancelled"])
     .gt(
       "current_period_end",
       now.toISOString()

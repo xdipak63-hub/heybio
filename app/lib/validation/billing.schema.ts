@@ -8,7 +8,8 @@ export const paidPlanSchema = z.enum([
 
 export const checkoutRequestSchema =
   z.object({
-    planId: paidPlanSchema
+    planId: paidPlanSchema,
+    mode: z.enum(["manual", "auto"])
   }).strict();
 
 export const cancellationRequestSchema =
@@ -90,3 +91,10 @@ export function parseAdminRefundRequest(
 ): AdminRefundRequest {
   return adminRefundRequestSchema.parse(input);
 }
+export const checkoutVerificationSchema = z.object({
+  mode: z.enum(["manual", "auto"]),
+  razorpay_payment_id: razorpayPaymentIdSchema,
+  razorpay_signature: z.string().regex(/^[a-fA-F0-9]{64}$/),
+  razorpay_order_id: z.string().regex(/^order_[A-Za-z0-9]+$/).optional(),
+  razorpay_subscription_id: razorpaySubscriptionIdSchema.optional()
+}).strict();

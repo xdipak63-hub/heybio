@@ -180,6 +180,9 @@ export default [
     "routes/api/username-availability.ts",
   ),
   route("api/checkout", "routes/api/checkout.ts"),
+  route("api/payment-verify", "routes/api/payment-verify.ts"),
+  route("api/billing-status", "routes/api/billing-status.ts"),
+  route("api/billing-change", "routes/api/billing-change.ts"),
   route(
     "api/subscription-cancel",
     "routes/api/subscription-cancel.ts",

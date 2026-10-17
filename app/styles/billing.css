@@ -437,3 +437,43 @@
     animation: none;
   }
 }
+
+/* Phase 2 — responsive, accessible next-period billing management */
+.hb-billing-manage {
+  margin-top: 24px;
+  padding: clamp(18px, 4vw, 28px);
+  background: #fff;
+  border: 1px solid #dedee3;
+  border-radius: 20px;
+  color: #1d1d1f;
+}
+.hb-billing-manage p, .hb-change-plan p { color: #56565c; line-height: 1.65; }
+.hb-billing-manage__heading, .hb-change-plan__header {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+}
+.hb-billing-manage__heading { justify-content: space-between; }
+.hb-billing-manage__heading h2 { margin: 0; font-size: clamp(20px, 3vw, 24px); }
+.hb-billing-manage__heading .hb-billing-text-button { display: inline-flex; gap: 6px; align-items: center; }
+.hb-change-plan { margin-top: 24px; padding-top: 22px; border-top: 1px solid #e5e5e8; }
+.hb-change-plan__header h3, .hb-billing-next-checkout h3, .hb-billing-cancel-wrap h3 {
+  margin: 0; font-size: 17px; letter-spacing: -.02em;
+}
+.hb-change-plan__fields { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 20px 0; }
+.hb-change-plan__fields label { display: grid; gap: 8px; font-size: 13px; font-weight: 650; }
+.hb-change-plan__fields select {
+  width: 100%; min-width: 0; border: 1px solid #b5b5bb; border-radius: 12px;
+  color: #1d1d1f; background: #fff; min-height: 46px; padding: 10px 12px;
+  font: inherit; font-size: 13px;
+}
+.hb-change-plan__fields select:focus-visible { outline: 3px solid #9fe7f5; outline-offset: 2px; }
+.hb-change-plan__saved, .hb-change-plan__alert {
+  padding: 12px 14px; border-radius: 12px; border: 1px solid #d9d9de; background: #f5f5f7;
+  font-size: 13px;
+}
+.hb-change-plan__saved { border-color: #a1bd68; background: #f6fce8; }
+.hb-billing-next-checkout, .hb-billing-cancel-wrap { margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e5e8; }
+.hb-billing-manage .hb-workspace__note { margin-top: 14px; }
+@media (max-width: 580px) { .hb-change-plan__fields { grid-template-columns: minmax(0, 1fr); } }
+
+.hb-change-plan__confirm { display: flex; gap: 10px; align-items: flex-start; margin: 18px 0; line-height: 1.55; font-size: 13px; font-weight: 600; }
+.hb-change-plan__confirm input { margin-top: 4px; width: 17px; height: 17px; flex: 0 0 17px; accent-color: #1d1d1f; }

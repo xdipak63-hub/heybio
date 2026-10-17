@@ -461,10 +461,10 @@ export default function ChoosePlanPage() {
             fontSize: 14,
           }}
         >
-          Paid plans require Razorpay authorization
-          for monthly recurring billing. Payment
-          does not instantly unlock features;
-          secure server verification is required.
+          Paid plans support manual one-month payments or consent-based
+          recurring Razorpay billing. Payment
+          does not unlock features until
+          secure server verification succeeds.
           Free and Pro do not include HYPE DROP.
         </p>
 

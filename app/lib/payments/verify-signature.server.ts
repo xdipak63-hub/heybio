@@ -122,3 +122,17 @@ export async function verifySubscriptionCheckoutSignature(
     input.razorpaySignature
   );
 }
+/** Order ID must be loaded from the user's server-side order record. */
+export async function verifyOrderCheckoutSignature(input: {
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+  secret: string;
+}): Promise<boolean> {
+  if (!/^order_[A-Za-z0-9]+$/.test(input.razorpayOrderId) ||
+      !/^pay_[A-Za-z0-9]+$/.test(input.razorpayPaymentId)) return false;
+  const signature = await signHmac(
+    `${input.razorpayOrderId}|${input.razorpayPaymentId}`, input.secret
+  );
+  return constantTimeCompare(signature, input.razorpaySignature);
+}

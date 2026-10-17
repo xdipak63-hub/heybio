@@ -56,6 +56,27 @@ type Pages = {
   "/community-guidelines": {
     params: {};
   };
+  "/refund-policy": {
+    params: {};
+  };
+  "/cancellation-policy": {
+    params: {};
+  };
+  "/support/help-center": {
+    params: {};
+  };
+  "/support/faqs": {
+    params: {};
+  };
+  "/support/getting-started": {
+    params: {};
+  };
+  "/support/report-problem": {
+    params: {};
+  };
+  "/support/submit-ticket": {
+    params: {};
+  };
   "/signup": {
     params: {};
   };
@@ -107,7 +128,81 @@ type Pages = {
   "/dashboard/appearance": {
     params: {};
   };
+  "/dashboard/preview": {
+    params: {};
+  };
+  "/dashboard/share": {
+    params: {};
+  };
+  "/dashboard/more": {
+    params: {};
+  };
+  "/dashboard/billing": {
+    params: {};
+  };
+  "/dashboard/payment-history": {
+    params: {};
+  };
+  "/dashboard/hype-drop": {
+    params: {};
+  };
+  "/dashboard/security": {
+    params: {};
+  };
+  "/dashboard/settings": {
+    params: {};
+  };
+  "/dashboard/integrations": {
+    params: {};
+  };
+  "/dashboard/analytics": {
+    params: {};
+  };
+  "/dashboard/audience": {
+    params: {};
+  };
   "/admin": {
+    params: {};
+  };
+  "/admin/users": {
+    params: {};
+  };
+  "/admin/users/:userId": {
+    params: {
+      "userId": string;
+    };
+  };
+  "/admin/profiles": {
+    params: {};
+  };
+  "/admin/subscriptions": {
+    params: {};
+  };
+  "/admin/payments": {
+    params: {};
+  };
+  "/admin/revenue": {
+    params: {};
+  };
+  "/admin/audit-logs": {
+    params: {};
+  };
+  "/admin/reports": {
+    params: {};
+  };
+  "/admin/refunds": {
+    params: {};
+  };
+  "/admin/hype-access": {
+    params: {};
+  };
+  "/admin/support": {
+    params: {};
+  };
+  "/admin/security": {
+    params: {};
+  };
+  "/admin/settings": {
     params: {};
   };
   "/api/social-links": {
@@ -116,10 +211,28 @@ type Pages = {
   "/api/uploads": {
     params: {};
   };
+  "/api/profile": {
+    params: {};
+  };
+  "/api/links": {
+    params: {};
+  };
+  "/api/billing-portal": {
+    params: {};
+  };
   "/api/username-availability": {
     params: {};
   };
   "/api/checkout": {
+    params: {};
+  };
+  "/api/payment-verify": {
+    params: {};
+  };
+  "/api/billing-status": {
+    params: {};
+  };
+  "/api/billing-change": {
     params: {};
   };
   "/api/subscription-cancel": {
@@ -134,6 +247,17 @@ type Pages = {
   "/api/admin-actions": {
     params: {};
   };
+  "/api/support-ticket": {
+    params: {};
+  };
+  "/api/analytics": {
+    params: {};
+  };
+  "/api/public-avatar/:username": {
+    params: {
+      "username": string;
+    };
+  };
   "/:username": {
     params: {
       "username": string;
@@ -144,7 +268,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/pricing" | "/features" | "/explore" | "/templates" | "/whats-new" | "/news" | "/about-heybio" | "/about-dipolabs" | "/our-story" | "/contact" | "/terms" | "/privacy" | "/cookies" | "/community-guidelines" | "/signup" | "/login" | "/auth/callback" | "/logout" | "/forgot-password" | "/reset-password" | "/verify-email" | "/auth/mfa-setup" | "/auth/mfa-verify" | "/onboarding/choose-username" | "/onboarding/choose-plan" | "/onboarding/create-profile" | "/onboarding/choose-template" | "/onboarding/complete" | "/dashboard" | "/dashboard/links" | "/dashboard/appearance" | "/admin" | "/api/social-links" | "/api/uploads" | "/api/username-availability" | "/api/checkout" | "/api/subscription-cancel" | "/api/razorpay-webhook" | "/api/hype-entitlement" | "/api/admin-actions" | "/:username";
+    page: "/" | "/pricing" | "/features" | "/explore" | "/templates" | "/whats-new" | "/news" | "/about-heybio" | "/about-dipolabs" | "/our-story" | "/contact" | "/terms" | "/privacy" | "/cookies" | "/community-guidelines" | "/refund-policy" | "/cancellation-policy" | "/support/help-center" | "/support/faqs" | "/support/getting-started" | "/support/report-problem" | "/support/submit-ticket" | "/signup" | "/login" | "/auth/callback" | "/logout" | "/forgot-password" | "/reset-password" | "/verify-email" | "/auth/mfa-setup" | "/auth/mfa-verify" | "/onboarding/choose-username" | "/onboarding/choose-plan" | "/onboarding/create-profile" | "/onboarding/choose-template" | "/onboarding/complete" | "/dashboard" | "/dashboard/links" | "/dashboard/appearance" | "/dashboard/preview" | "/dashboard/share" | "/dashboard/more" | "/dashboard/billing" | "/dashboard/payment-history" | "/dashboard/hype-drop" | "/dashboard/security" | "/dashboard/settings" | "/dashboard/integrations" | "/dashboard/analytics" | "/dashboard/audience" | "/admin" | "/admin/users" | "/admin/users/:userId" | "/admin/profiles" | "/admin/subscriptions" | "/admin/payments" | "/admin/revenue" | "/admin/audit-logs" | "/admin/reports" | "/admin/refunds" | "/admin/hype-access" | "/admin/support" | "/admin/security" | "/admin/settings" | "/api/social-links" | "/api/uploads" | "/api/profile" | "/api/links" | "/api/billing-portal" | "/api/username-availability" | "/api/checkout" | "/api/payment-verify" | "/api/billing-status" | "/api/billing-change" | "/api/subscription-cancel" | "/api/razorpay-webhook" | "/api/hype-entitlement" | "/api/admin-actions" | "/api/support-ticket" | "/api/analytics" | "/api/public-avatar/:username" | "/:username";
   };
   "routes/marketing/home.tsx": {
     id: "routes/marketing/home";
@@ -206,6 +330,34 @@ type RouteFiles = {
     id: "routes/legal/community-guidelines";
     page: "/community-guidelines";
   };
+  "routes/legal/refund-policy.tsx": {
+    id: "routes/legal/refund-policy";
+    page: "/refund-policy";
+  };
+  "routes/legal/cancellation-policy.tsx": {
+    id: "routes/legal/cancellation-policy";
+    page: "/cancellation-policy";
+  };
+  "routes/support/help-center.tsx": {
+    id: "routes/support/help-center";
+    page: "/support/help-center";
+  };
+  "routes/support/faqs.tsx": {
+    id: "routes/support/faqs";
+    page: "/support/faqs";
+  };
+  "routes/support/getting-started.tsx": {
+    id: "routes/support/getting-started";
+    page: "/support/getting-started";
+  };
+  "routes/support/report-problem.tsx": {
+    id: "routes/support/report-problem";
+    page: "/support/report-problem";
+  };
+  "routes/support/submit-ticket.tsx": {
+    id: "routes/support/submit-ticket";
+    page: "/support/submit-ticket";
+  };
   "routes/auth/signup.tsx": {
     id: "routes/auth/signup";
     page: "/signup";
@@ -262,6 +414,10 @@ type RouteFiles = {
     id: "routes/onboarding/complete";
     page: "/onboarding/complete";
   };
+  "routes/dashboard/layout.tsx": {
+    id: "routes/dashboard/layout";
+    page: "/dashboard" | "/dashboard/links" | "/dashboard/appearance" | "/dashboard/preview" | "/dashboard/share" | "/dashboard/more" | "/dashboard/billing" | "/dashboard/payment-history" | "/dashboard/hype-drop" | "/dashboard/security" | "/dashboard/settings" | "/dashboard/integrations" | "/dashboard/analytics" | "/dashboard/audience";
+  };
   "routes/dashboard/overview.tsx": {
     id: "routes/dashboard/overview";
     page: "/dashboard";
@@ -274,13 +430,109 @@ type RouteFiles = {
     id: "routes/dashboard/appearance";
     page: "/dashboard/appearance";
   };
+  "routes/dashboard/preview.tsx": {
+    id: "routes/dashboard/preview";
+    page: "/dashboard/preview";
+  };
+  "routes/dashboard/share.tsx": {
+    id: "routes/dashboard/share";
+    page: "/dashboard/share";
+  };
+  "routes/dashboard/more.tsx": {
+    id: "routes/dashboard/more";
+    page: "/dashboard/more";
+  };
+  "routes/dashboard/billing.tsx": {
+    id: "routes/dashboard/billing";
+    page: "/dashboard/billing";
+  };
+  "routes/dashboard/payment-history.tsx": {
+    id: "routes/dashboard/payment-history";
+    page: "/dashboard/payment-history";
+  };
+  "routes/dashboard/hype-drop.tsx": {
+    id: "routes/dashboard/hype-drop";
+    page: "/dashboard/hype-drop";
+  };
+  "routes/dashboard/security.tsx": {
+    id: "routes/dashboard/security";
+    page: "/dashboard/security";
+  };
+  "routes/dashboard/settings.tsx": {
+    id: "routes/dashboard/settings";
+    page: "/dashboard/settings";
+  };
+  "routes/dashboard/integrations.tsx": {
+    id: "routes/dashboard/integrations";
+    page: "/dashboard/integrations";
+  };
+  "routes/dashboard/insights.tsx": {
+    id: "routes/dashboard/insights";
+    page: "/dashboard/analytics";
+  };
+  "routes/dashboard/audience.tsx": {
+    id: "routes/dashboard/audience";
+    page: "/dashboard/audience";
+  };
   "routes/admin/layout.tsx": {
     id: "routes/admin/layout";
-    page: "/admin";
+    page: "/admin" | "/admin/users" | "/admin/users/:userId" | "/admin/profiles" | "/admin/subscriptions" | "/admin/payments" | "/admin/revenue" | "/admin/audit-logs" | "/admin/reports" | "/admin/refunds" | "/admin/hype-access" | "/admin/support" | "/admin/security" | "/admin/settings";
   };
   "routes/admin/overview.tsx": {
     id: "routes/admin/overview";
     page: "/admin";
+  };
+  "routes/admin/users.tsx": {
+    id: "routes/admin/users";
+    page: "/admin/users";
+  };
+  "routes/admin/user-detail.tsx": {
+    id: "routes/admin/user-detail";
+    page: "/admin/users/:userId";
+  };
+  "routes/admin/profiles.tsx": {
+    id: "routes/admin/profiles";
+    page: "/admin/profiles";
+  };
+  "routes/admin/subscriptions.tsx": {
+    id: "routes/admin/subscriptions";
+    page: "/admin/subscriptions";
+  };
+  "routes/admin/payments.tsx": {
+    id: "routes/admin/payments";
+    page: "/admin/payments";
+  };
+  "routes/admin/revenue.tsx": {
+    id: "routes/admin/revenue";
+    page: "/admin/revenue";
+  };
+  "routes/admin/audit-logs.tsx": {
+    id: "routes/admin/audit-logs";
+    page: "/admin/audit-logs";
+  };
+  "routes/admin/reports.tsx": {
+    id: "routes/admin/reports";
+    page: "/admin/reports";
+  };
+  "routes/admin/refunds.tsx": {
+    id: "routes/admin/refunds";
+    page: "/admin/refunds";
+  };
+  "routes/admin/hype-access.tsx": {
+    id: "routes/admin/hype-access";
+    page: "/admin/hype-access";
+  };
+  "routes/admin/support.tsx": {
+    id: "routes/admin/support";
+    page: "/admin/support";
+  };
+  "routes/admin/security.tsx": {
+    id: "routes/admin/security";
+    page: "/admin/security";
+  };
+  "routes/admin/settings.tsx": {
+    id: "routes/admin/settings";
+    page: "/admin/settings";
   };
   "routes/api/social-links.ts": {
     id: "routes/api/social-links";
@@ -290,6 +542,18 @@ type RouteFiles = {
     id: "routes/api/uploads";
     page: "/api/uploads";
   };
+  "routes/api/profile.ts": {
+    id: "routes/api/profile";
+    page: "/api/profile";
+  };
+  "routes/api/links.ts": {
+    id: "routes/api/links";
+    page: "/api/links";
+  };
+  "routes/api/billing-portal.ts": {
+    id: "routes/api/billing-portal";
+    page: "/api/billing-portal";
+  };
   "routes/api/username-availability.ts": {
     id: "routes/api/username-availability";
     page: "/api/username-availability";
@@ -297,6 +561,18 @@ type RouteFiles = {
   "routes/api/checkout.ts": {
     id: "routes/api/checkout";
     page: "/api/checkout";
+  };
+  "routes/api/payment-verify.ts": {
+    id: "routes/api/payment-verify";
+    page: "/api/payment-verify";
+  };
+  "routes/api/billing-status.ts": {
+    id: "routes/api/billing-status";
+    page: "/api/billing-status";
+  };
+  "routes/api/billing-change.ts": {
+    id: "routes/api/billing-change";
+    page: "/api/billing-change";
   };
   "routes/api/subscription-cancel.ts": {
     id: "routes/api/subscription-cancel";
@@ -313,6 +589,18 @@ type RouteFiles = {
   "routes/api/admin-actions.ts": {
     id: "routes/api/admin-actions";
     page: "/api/admin-actions";
+  };
+  "routes/api/support-ticket.ts": {
+    id: "routes/api/support-ticket";
+    page: "/api/support-ticket";
+  };
+  "routes/api/analytics.ts": {
+    id: "routes/api/analytics";
+    page: "/api/analytics";
+  };
+  "routes/api/public-avatar.ts": {
+    id: "routes/api/public-avatar";
+    page: "/api/public-avatar/:username";
   };
   "routes/public/profile.tsx": {
     id: "routes/public/profile";
@@ -337,6 +625,13 @@ type RouteModules = {
   "routes/legal/privacy": typeof import("./app/routes/legal/privacy.tsx");
   "routes/legal/cookies": typeof import("./app/routes/legal/cookies.tsx");
   "routes/legal/community-guidelines": typeof import("./app/routes/legal/community-guidelines.tsx");
+  "routes/legal/refund-policy": typeof import("./app/routes/legal/refund-policy.tsx");
+  "routes/legal/cancellation-policy": typeof import("./app/routes/legal/cancellation-policy.tsx");
+  "routes/support/help-center": typeof import("./app/routes/support/help-center.tsx");
+  "routes/support/faqs": typeof import("./app/routes/support/faqs.tsx");
+  "routes/support/getting-started": typeof import("./app/routes/support/getting-started.tsx");
+  "routes/support/report-problem": typeof import("./app/routes/support/report-problem.tsx");
+  "routes/support/submit-ticket": typeof import("./app/routes/support/submit-ticket.tsx");
   "routes/auth/signup": typeof import("./app/routes/auth/signup.tsx");
   "routes/auth/login": typeof import("./app/routes/auth/login.tsx");
   "routes/auth/callback": typeof import("./app/routes/auth/callback.tsx");
@@ -351,18 +646,52 @@ type RouteModules = {
   "routes/onboarding/create-profile": typeof import("./app/routes/onboarding/create-profile.tsx");
   "routes/onboarding/choose-template": typeof import("./app/routes/onboarding/choose-template.tsx");
   "routes/onboarding/complete": typeof import("./app/routes/onboarding/complete.tsx");
+  "routes/dashboard/layout": typeof import("./app/routes/dashboard/layout.tsx");
   "routes/dashboard/overview": typeof import("./app/routes/dashboard/overview.tsx");
   "routes/dashboard/links": typeof import("./app/routes/dashboard/links.tsx");
   "routes/dashboard/appearance": typeof import("./app/routes/dashboard/appearance.tsx");
+  "routes/dashboard/preview": typeof import("./app/routes/dashboard/preview.tsx");
+  "routes/dashboard/share": typeof import("./app/routes/dashboard/share.tsx");
+  "routes/dashboard/more": typeof import("./app/routes/dashboard/more.tsx");
+  "routes/dashboard/billing": typeof import("./app/routes/dashboard/billing.tsx");
+  "routes/dashboard/payment-history": typeof import("./app/routes/dashboard/payment-history.tsx");
+  "routes/dashboard/hype-drop": typeof import("./app/routes/dashboard/hype-drop.tsx");
+  "routes/dashboard/security": typeof import("./app/routes/dashboard/security.tsx");
+  "routes/dashboard/settings": typeof import("./app/routes/dashboard/settings.tsx");
+  "routes/dashboard/integrations": typeof import("./app/routes/dashboard/integrations.tsx");
+  "routes/dashboard/insights": typeof import("./app/routes/dashboard/insights.tsx");
+  "routes/dashboard/audience": typeof import("./app/routes/dashboard/audience.tsx");
   "routes/admin/layout": typeof import("./app/routes/admin/layout.tsx");
   "routes/admin/overview": typeof import("./app/routes/admin/overview.tsx");
+  "routes/admin/users": typeof import("./app/routes/admin/users.tsx");
+  "routes/admin/user-detail": typeof import("./app/routes/admin/user-detail.tsx");
+  "routes/admin/profiles": typeof import("./app/routes/admin/profiles.tsx");
+  "routes/admin/subscriptions": typeof import("./app/routes/admin/subscriptions.tsx");
+  "routes/admin/payments": typeof import("./app/routes/admin/payments.tsx");
+  "routes/admin/revenue": typeof import("./app/routes/admin/revenue.tsx");
+  "routes/admin/audit-logs": typeof import("./app/routes/admin/audit-logs.tsx");
+  "routes/admin/reports": typeof import("./app/routes/admin/reports.tsx");
+  "routes/admin/refunds": typeof import("./app/routes/admin/refunds.tsx");
+  "routes/admin/hype-access": typeof import("./app/routes/admin/hype-access.tsx");
+  "routes/admin/support": typeof import("./app/routes/admin/support.tsx");
+  "routes/admin/security": typeof import("./app/routes/admin/security.tsx");
+  "routes/admin/settings": typeof import("./app/routes/admin/settings.tsx");
   "routes/api/social-links": typeof import("./app/routes/api/social-links.ts");
   "routes/api/uploads": typeof import("./app/routes/api/uploads.ts");
+  "routes/api/profile": typeof import("./app/routes/api/profile.ts");
+  "routes/api/links": typeof import("./app/routes/api/links.ts");
+  "routes/api/billing-portal": typeof import("./app/routes/api/billing-portal.ts");
   "routes/api/username-availability": typeof import("./app/routes/api/username-availability.ts");
   "routes/api/checkout": typeof import("./app/routes/api/checkout.ts");
+  "routes/api/payment-verify": typeof import("./app/routes/api/payment-verify.ts");
+  "routes/api/billing-status": typeof import("./app/routes/api/billing-status.ts");
+  "routes/api/billing-change": typeof import("./app/routes/api/billing-change.ts");
   "routes/api/subscription-cancel": typeof import("./app/routes/api/subscription-cancel.ts");
   "routes/api/razorpay-webhook": typeof import("./app/routes/api/razorpay-webhook.ts");
   "routes/api/hype-entitlement": typeof import("./app/routes/api/hype-entitlement.ts");
   "routes/api/admin-actions": typeof import("./app/routes/api/admin-actions.ts");
+  "routes/api/support-ticket": typeof import("./app/routes/api/support-ticket.ts");
+  "routes/api/analytics": typeof import("./app/routes/api/analytics.ts");
+  "routes/api/public-avatar": typeof import("./app/routes/api/public-avatar.ts");
   "routes/public/profile": typeof import("./app/routes/public/profile.tsx");
 };

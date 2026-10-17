@@ -33,6 +33,25 @@ export async function requireAdminPage(
         error.status === 401 ||
         error.status === 403;
 
+      // MFA failures should lead to the verification screen,
+      // not silently send an authorized admin to the homepage.
+      // Never grant access here: requireAdmin still enforces AAL2.
+      const isMfaRequired =
+        error.status === 403 &&
+        (await error.clone().text()).trim() ===
+          "Multi-factor authentication is required.";
+
+      if (isMfaRequired) {
+        const headers = new Headers();
+        headers.set("Cache-Control", "private, no-store, max-age=0");
+        error.headers.forEach((value, key) => {
+          if (key.toLowerCase() === "set-cookie") {
+            headers.append(key, value);
+          }
+        });
+        throw redirect("/auth/mfa-verify", { headers });
+      }
+
       if (isAuthRedirect || isAccessDenied) {
         const headers = new Headers();
 

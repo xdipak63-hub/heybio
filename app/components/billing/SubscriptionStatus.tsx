@@ -14,6 +14,7 @@ type Props = {
   cancelAtPeriodEnd?: boolean;
   hypeDrop: boolean;
   loading?: boolean;
+  renewalMode?: "manual" | "auto" | null;
 };
 
 function dateLabel(value?: string | null) {
@@ -34,7 +35,8 @@ export default function SubscriptionStatus({
   currentPeriodEnd,
   cancelAtPeriodEnd = false,
   hypeDrop,
-  loading = false
+  loading = false,
+  renewalMode = null
 }: Props) {
   const safePlan = isPlanId(plan) ? plan : "free";
   const verifiedPaid = active && safePlan !== "free";
@@ -66,6 +68,10 @@ export default function SubscriptionStatus({
             {dateLabel(currentPeriodEnd)}
           </strong>
         </div>
+        {verifiedPaid && (<div>
+          <span>Renewal method</span>
+          <strong>{renewalMode === "auto" ? "Authorized auto-renewal" : "Manual monthly payment"}</strong>
+        </div>)}
         <div>
           <span>HYPE DROP</span>
           <strong>

@@ -5,6 +5,7 @@ import type {
 } from "react-router";
 
 import { requireUser } from "../../lib/auth/require-user.server";
+import { requireRateLimit } from "../../lib/security/rate-limit.server";
 
 import {
   requireCsrfProtection,
@@ -72,6 +73,8 @@ export async function action({
   requireCsrfProtection(request);
 
   const { user, client } = await requireUser(request, context);
+  await requireRateLimit((context as { cloudflare?: { env?: unknown } }).cloudflare?.env,
+    { namespace: "support-ticket", key: user.id });
 
   const declared = Number(
     request.headers.get("content-length") || 0,
