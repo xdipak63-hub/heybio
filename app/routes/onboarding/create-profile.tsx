@@ -1,4 +1,6 @@
 
+import Logo from "../../components/shared/Logo";
+
 import {
   Form,
   Link,
@@ -176,17 +178,7 @@ export default function CreateProfilePage() {
             "0 18px 60px rgba(0,0,0,.05)",
         }}
       >
-        <Link
-          to="/"
-          style={{
-            color: "#1D1D1F",
-            textDecoration: "none",
-            fontSize: 27,
-            fontWeight: 900,
-          }}
-        >
-          HEYBIO↗
-        </Link>
+        <Logo size="sm" />
 
         <div style={{ marginTop: 42 }}>
           <UserRound size={30} />

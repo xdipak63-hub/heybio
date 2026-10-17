@@ -1,12 +1,11 @@
+
 import {
-  Form,
+  Link,
   data,
   redirect,
-  useLoaderData
-} from "react-router";
-
-import type {
-  LoaderFunctionArgs
+  useLoaderData,
+  type LoaderFunctionArgs,
+  type MetaFunction,
 } from "react-router";
 
 import {
@@ -15,212 +14,240 @@ import {
   CreditCard,
   Link2,
   Palette,
-  ShieldCheck,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 
-import {
-  requireUser
-} from "../../lib/auth/require-user.server";
+import { requireUser } from "../../lib/auth/require-user.server";
 
-export function meta() {
-  return [
-    { title: "Dashboard — HEYBIO" },
-    {
-      name: "robots",
-      content: "noindex, nofollow"
-    }
-  ];
-}
+export const meta: MetaFunction = () => [
+  { title: "Dashboard — HEYBIO" },
+  { name: "robots", content: "noindex, nofollow" },
+];
 
 export async function loader({
   request,
-  context
+  context,
 }: LoaderFunctionArgs) {
-  const { user, client } =
-    await requireUser(request, context);
+  const { user, client } = await requireUser(
+    request,
+    context,
+  );
 
-  const { data: profile, error } =
-    await client.supabase
-      .from("profiles")
-      .select(
-        "username, display_name, bio, created_at"
-      )
-      .eq("id", user.id)
-      .maybeSingle();
+  const [profile, links, activeLinks] =
+    await Promise.all([
+      client.supabase
+        .from("profiles")
+        .select("username,display_name,bio")
+        .eq("id", user.id)
+        .maybeSingle(),
 
-  if (error) {
+      client.supabase
+        .from("links")
+        .select("id", {
+          count: "exact",
+          head: true,
+        })
+        .eq("profile_id", user.id),
+
+      client.supabase
+        .from("links")
+        .select("id", {
+          count: "exact",
+          head: true,
+        })
+        .eq("profile_id", user.id)
+        .eq("is_active", true),
+    ]);
+
+  if (
+    profile.error ||
+    links.error ||
+    activeLinks.error
+  ) {
     throw new Response(
-      "Could not load your dashboard.",
+      "Unable to load your dashboard.",
       {
         status: 503,
-        headers: client.headers
-      }
+        headers: client.headers,
+      },
     );
   }
 
-  if (!profile?.username) {
+  if (!profile.data?.username) {
     throw redirect(
       "/onboarding/choose-username",
-      { headers: client.headers }
+      { headers: client.headers },
     );
   }
 
   return data(
     {
-      email: user.email ?? "",
-      username: profile.username,
+      username: profile.data.username,
       displayName:
-        profile.display_name ||
-        profile.username,
-      bio: profile.bio
+        profile.data.display_name ||
+        profile.data.username,
+      totalLinks: links.count ?? 0,
+      visibleLinks: activeLinks.count ?? 0,
     },
-    { headers: client.headers }
+    { headers: client.headers },
   );
 }
 
-const upcomingTools = [
+const TOOLS = [
   {
-    icon: Link2,
+    to: "/dashboard/links",
     title: "My Links",
     description:
-      "Create, organize and share your content."
+      "Create, edit and organize your links.",
+    icon: Link2,
   },
   {
-    icon: Palette,
+    to: "/dashboard/appearance",
     title: "Appearance",
     description:
-      "Customize your theme and profile design."
+      "Design a page that feels like you.",
+    icon: Palette,
   },
   {
-    icon: BarChart3,
+    to: "/dashboard/analytics",
     title: "Insights",
     description:
-      "Understand your audience and engagement."
+      "Explore performance when available on your plan.",
+    icon: BarChart3,
   },
   {
-    icon: CreditCard,
+    to: "/dashboard/billing",
     title: "Subscription",
     description:
-      "Manage your plan and future billing."
-  }
-];
+      "View your verified plan and billing history.",
+    icon: CreditCard,
+  },
+] as const;
 
 export default function DashboardOverview() {
   const {
-    email,
     username,
-    displayName
+    displayName,
+    totalLinks,
+    visibleLinks,
   } = useLoaderData<typeof loader>();
 
   return (
-    <main className="dashboard-page">
-      <header className="dashboard-header">
-        <a href="/" className="brand">
-          HEYBIO
-          <span className="brand-arrow">↗</span>
-        </a>
-
-        <Form action="/logout" method="post">
-          <button
-            className="dashboard-logout"
-            type="submit"
-          >
-            Log out
-          </button>
-        </Form>
-      </header>
-
-      <div className="dashboard-container">
-        <div className="dashboard-welcome">
-          <span className="eyebrow">
-            YOUR CREATOR SPACE
-          </span>
-
-          <h1>
-            Hey, {displayName}
-            <span> ✳</span>
-          </h1>
-
-          <p>
-            Welcome to your HEYBIO dashboard.
-            Your creator foundation is ready.
-          </p>
-        </div>
-
-        <div className="dashboard-profile-card">
-          <div className="dashboard-profile-card__avatar">
-            {displayName.charAt(0).toUpperCase()}
-          </div>
-
+    <section className="hb-workspace">
+      <div className="hb-workspace__container">
+        <div className="hb-workspace__heading">
           <div>
-            <span>YOUR HEYBIO IDENTITY</span>
-            <h2>@{username}</h2>
-            <p>{email}</p>
+            <span className="hb-workspace__eyebrow">
+              YOUR CREATOR SPACE
+            </span>
+
+            <h1>
+              Hey, {displayName}.
+            </h1>
+
+            <p>
+              Your page, your content, your world.
+              Everything begins here.
+            </p>
           </div>
 
-          <div className="dashboard-profile-card__badge">
-            <ShieldCheck size={17} />
-            Verified session
+          <div className="hb-workspace__actions">
+            <Link
+              className="hb-workspace__button hb-workspace__button--primary"
+              to="/dashboard/links"
+            >
+              Manage links
+              <ArrowUpRight size={16} />
+            </Link>
           </div>
         </div>
 
-        <div className="dashboard-section-heading">
+        <div className="hb-dash-overview-stats">
+          <article>
+            <span>Total links</span>
+            <strong>{totalLinks}</strong>
+            <p>
+              Links saved in your creator account.
+            </p>
+          </article>
+
+          <article>
+            <span>Visible links</span>
+            <strong>{visibleLinks}</strong>
+            <p>
+              Links enabled for public viewing.
+            </p>
+          </article>
+
+          <article>
+            <span>Your HEYBIO</span>
+            <strong>@{username}</strong>
+            <p>
+              Your unique creator username.
+            </p>
+          </article>
+        </div>
+
+        <div className="hb-dash-overview-heading">
           <div>
-            <span className="eyebrow">
-              YOUR CREATOR TOOLKIT
+            <span className="hb-workspace__eyebrow">
+              CREATOR TOOLS
             </span>
 
             <h2>
-              Everything starts here.
+              Make your page your own.
             </h2>
           </div>
-
-          <span className="dashboard-coming">
-            MORE TO COME
-          </span>
         </div>
 
-        <div className="dashboard-tools">
-          {upcomingTools.map((tool) => {
+        <div className="hb-dash-overview-tools">
+          {TOOLS.map((tool) => {
             const Icon = tool.icon;
 
             return (
-              <article
-                className="dashboard-tool"
-                key={tool.title}
+              <Link
+                to={tool.to}
+                key={tool.to}
+                className="hb-dash-overview-tool"
               >
-                <div className="dashboard-tool__top">
-                  <Icon size={27} />
-                  <ArrowUpRight size={19} />
-                </div>
+                <span className="hb-dash-overview-tool__icon">
+                  <Icon
+                    size={23}
+                    aria-hidden="true"
+                  />
+                </span>
 
                 <h3>{tool.title}</h3>
                 <p>{tool.description}</p>
 
-                <span>
-                  In development
+                <span className="hb-dash-overview-tool__open">
+                  Open tool ↗
                 </span>
-              </article>
+              </Link>
             );
           })}
         </div>
 
-        <div className="dashboard-hype">
-          <Sparkles size={31} />
+        <div className="hb-dash-overview-hype">
+          <Sparkles size={25} aria-hidden="true" />
 
           <div>
-            <h3>HYPE DROP</h3>
+            <h2>
+              HYPE DROP
+            </h2>
+
             <p>
-              Access will be connected to verified
-              Premium and Pro Max subscriptions
-              in the billing phase.
+              Make Every Launch Feel Legendary.
+              Available with verified Premium
+              and Pro Max access.
             </p>
           </div>
 
-          <span>COMING SOON</span>
+          <Link to="/dashboard/hype-drop">
+            Explore ↗
+          </Link>
         </div>
       </div>
-    </main>
+    </section>
   );
 }

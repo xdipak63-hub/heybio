@@ -1,0 +1,112 @@
+
+/*
+ * HEYBIO ↗
+ * Purposeful motion primitives.
+ * By DIPO LABS
+ *
+ * Apply these classes intentionally.
+ * Content must not depend on animation
+ * to become accessible.
+ */
+
+@keyframes hb-reveal-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hb-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hb-soft-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hb-motion-reveal {
+  animation:
+    hb-reveal-up
+    420ms
+    cubic-bezier(.2, .75, .25, 1)
+    both;
+}
+
+.hb-motion-fade {
+  animation:
+    hb-fade-in
+    300ms
+    ease-out
+    both;
+}
+
+.hb-motion-delay-1 {
+  animation-delay: 70ms;
+}
+
+.hb-motion-delay-2 {
+  animation-delay: 140ms;
+}
+
+.hb-motion-delay-3 {
+  animation-delay: 210ms;
+}
+
+.hb-motion-spinner {
+  animation:
+    hb-soft-spin
+    800ms
+    linear
+    infinite;
+}
+
+.hb-motion-control {
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hb-motion-control:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.hb-motion-control:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.hb-motion-control:focus-visible {
+  outline: 3px solid #1D1D1F;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-motion-reveal,
+  .hb-motion-fade,
+  .hb-motion-spinner {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .hb-motion-control {
+    transition: none !important;
+    transform: none !important;
+  }
+}

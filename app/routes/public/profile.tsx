@@ -3,62 +3,86 @@ import {
   data,
   Link,
   useLoaderData,
-  type LoaderFunctionArgs
+  type LoaderFunctionArgs,
 } from "react-router";
 
-import { ArrowLeft, Share2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Share2,
+} from "lucide-react";
 
 import {
-  createSupabaseServer
+  createSupabaseServer,
 } from "../../lib/supabase/server";
 
 import ProfilePreview, {
-  type PreviewProfile
+  type PreviewProfile,
+  type PublicSocialLink,
 } from "../../components/creator/ProfilePreview";
 
 import {
   ACCENT_COLORS,
   BUTTON_STYLES,
   THEME_PRESETS,
-  type ProfileTheme
+  type ProfileTheme,
 } from "../../components/creator/ThemePicker";
 
 import "./public-profile.css";
 
-type RawLink = {
-  id: unknown;
-  title: unknown;
-  url: unknown;
-  description?: unknown;
-};
+const USERNAME =
+  /^[a-z][a-z0-9_]{2,29}$/;
+
+const PLATFORMS = new Set([
+  "instagram",
+  "youtube",
+  "tiktok",
+  "facebook",
+  "x",
+  "linkedin",
+  "github",
+  "threads",
+  "pinterest",
+  "snapchat",
+  "twitch",
+  "website",
+]);
 
 type RawProfile = {
   username?: unknown;
   displayName?: unknown;
   bio?: unknown;
+  hasAvatar?: unknown;
   theme?: {
     preset?: unknown;
     accent?: unknown;
     buttonStyle?: unknown;
   };
   links?: unknown;
+  socialLinks?: unknown;
 };
 
-const USERNAME_PATTERN = /^[a-z][a-z0-9_]{2,29}$/;
-
-function safeUsername(value: string): boolean {
-  return USERNAME_PATTERN.test(value);
+function safeText(
+  input: unknown,
+  limit: number,
+): string {
+  return typeof input === "string"
+    ? input.trim().slice(0, limit)
+    : "";
 }
 
-function safeExternalUrl(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-
-  const input = value.trim();
+function safeUrl(
+  input: unknown,
+  requireHttps = false,
+): string | null {
+  if (typeof input !== "string") {
+    return null;
+  }
 
   if (
-    !input ||
     input.length > 2048 ||
-    /[\u0000-\u001F\u007F\\]/.test(input)
+    /[\u0000-\u001f\u007f\\]/.test(
+      input,
+    )
   ) {
     return null;
   }
@@ -68,12 +92,19 @@ function safeExternalUrl(value: unknown): string | null {
 
     if (
       url.protocol !== "https:" &&
-      url.protocol !== "http:"
+      (requireHttps ||
+        url.protocol !== "http:")
     ) {
       return null;
     }
 
-    if (url.username || url.password) return null;
+    if (
+      !url.hostname ||
+      url.username ||
+      url.password
+    ) {
+      return null;
+    }
 
     return url.href;
   } catch {
@@ -81,161 +112,249 @@ function safeExternalUrl(value: unknown): string | null {
   }
 }
 
-function safeText(
-  value: unknown,
-  maxLength: number
-): string {
-  return typeof value === "string"
-    ? value.trim().slice(0, maxLength)
-    : "";
-}
-
-function resolveTheme(
-  raw: RawProfile["theme"]
+function safeTheme(
+  raw: RawProfile["theme"],
 ): ProfileTheme {
-  const preset =
-    THEME_PRESETS.find(
-      (item) => item.id === raw?.preset
-    )?.id ?? "classic";
-
-  const accent =
-    ACCENT_COLORS.find(
-      (item) => item === raw?.accent
-    ) ?? "#BDF806";
-
-  const buttonStyle =
-    BUTTON_STYLES.find(
-      (item) => item.id === raw?.buttonStyle
-    )?.id ?? "rounded";
-
   return {
-    preset,
-    accent,
-    buttonStyle
+    preset:
+      THEME_PRESETS.find(
+        (item) => item.id === raw?.preset,
+      )?.id ?? "classic",
+
+    accent:
+      ACCENT_COLORS.find(
+        (item) => item === raw?.accent,
+      ) ?? "#BDF806",
+
+    buttonStyle:
+      BUTTON_STYLES.find(
+        (item) =>
+          item.id === raw?.buttonStyle,
+      )?.id ?? "rounded",
   };
 }
 
-function resolveProfile(
-  value: unknown,
-  requestedUsername: string
+function parseProfile(
+  record: unknown,
+  requested: string,
 ): PreviewProfile | null {
   if (
-    !value ||
-    typeof value !== "object" ||
-    Array.isArray(value)
+    !record ||
+    typeof record !== "object" ||
+    Array.isArray(record)
   ) {
     return null;
   }
 
-  const raw = value as RawProfile;
-  const username = safeText(raw.username, 30).toLowerCase();
+  const raw = record as RawProfile;
+
+  const username = safeText(
+    raw.username,
+    30,
+  ).toLowerCase();
 
   if (
-    !safeUsername(username) ||
-    username !== requestedUsername
+    !USERNAME.test(username) ||
+    username !== requested
   ) {
     return null;
   }
 
-  const rawLinks = Array.isArray(raw.links)
-    ? raw.links
-    : [];
+  const links = (
+    Array.isArray(raw.links)
+      ? raw.links.slice(0, 250)
+      : []
+  ).flatMap((entry: unknown) => {
+    if (
+      !entry ||
+      typeof entry !== "object" ||
+      Array.isArray(entry)
+    ) {
+      return [];
+    }
 
-  const links = rawLinks
-    .slice(0, 250)
-    .flatMap((entry: unknown) => {
-      if (!entry || typeof entry !== "object") return [];
+    const value =
+      entry as Record<string, unknown>;
 
-      const link = entry as RawLink;
-      const id = safeText(link.id, 100);
-      const title = safeText(link.title, 160);
-      const url = safeExternalUrl(link.url);
+    const id = safeText(
+      value.id,
+      100,
+    );
 
-      if (!id || !title || !url) return [];
+    const title = safeText(
+      value.title,
+      100,
+    );
 
-      return [{
-        id,
-        title,
-        url,
-        description: safeText(link.description, 300)
-      }];
-    });
+    const url = safeUrl(value.url);
+
+    if (!id || !title || !url) {
+      return [];
+    }
+
+    return [{
+      id,
+      title,
+      url,
+      description: safeText(
+        value.description,
+        200,
+      ),
+    }];
+  });
+
+  const socialLinks: PublicSocialLink[] = (
+    Array.isArray(raw.socialLinks)
+      ? raw.socialLinks.slice(0, 12)
+      : []
+  ).flatMap((entry: unknown) => {
+    if (
+      !entry ||
+      typeof entry !== "object" ||
+      Array.isArray(entry)
+    ) {
+      return [];
+    }
+
+    const value =
+      entry as Record<string, unknown>;
+
+    const platform = safeText(
+      value.platform,
+      40,
+    );
+
+    const url = safeUrl(
+      value.url,
+      true,
+    );
+
+    if (
+      !PLATFORMS.has(platform) ||
+      !url
+    ) {
+      return [];
+    }
+
+    return [{
+      platform,
+      url,
+    }];
+  });
 
   return {
     username,
-    displayName: safeText(raw.displayName, 100) || username,
-    bio: safeText(raw.bio, 500),
-    theme: resolveTheme(raw.theme),
-    links
+    displayName:
+      safeText(
+        raw.displayName,
+        80,
+      ) || username,
+
+    bio: safeText(
+      raw.bio,
+      500,
+    ),
+
+    avatarUrl:
+      raw.hasAvatar === true
+        ? `/api/public-avatar/${encodeURIComponent(username)}`
+        : null,
+
+    theme: safeTheme(raw.theme),
+    links,
+    socialLinks,
   };
 }
 
 export async function loader({
   request,
   context,
-  params
+  params,
 }: LoaderFunctionArgs) {
   const username = String(
-    params.username ?? ""
+    params.username ?? "",
   ).toLowerCase();
 
-  if (!safeUsername(username)) {
-    throw new Response("Profile not found", {
-      status: 404,
-      headers: { "Cache-Control": "no-store" }
-    });
+  if (!USERNAME.test(username)) {
+    throw new Response(
+      "Profile not found.",
+      {
+        status: 404,
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+    );
   }
 
   const { supabase, headers } =
-    createSupabaseServer(request, context);
+    createSupabaseServer(
+      request,
+      context,
+    );
 
-  const { data: record, error } = await supabase.rpc(
-    "get_public_profile",
-    { p_username: username }
-  );
+  const { data: record, error } =
+    await supabase.rpc(
+      "get_public_profile",
+      { p_username: username },
+    );
 
   if (error) {
-    console.error("Public profile lookup failed", {
-      code: error.code
-    });
+    console.error(
+      "Public profile lookup failed",
+      { code: error.code },
+    );
 
-    throw new Response("Profile temporarily unavailable", {
-      status: 503,
-      headers: {
-        ...Object.fromEntries(headers.entries()),
-        "Cache-Control": "no-store"
-      }
-    });
+    throw new Response(
+      "Profile temporarily unavailable.",
+      {
+        status: 503,
+        headers,
+      },
+    );
   }
 
-  const profile = resolveProfile(record, username);
+  const profile = parseProfile(
+    record,
+    username,
+  );
 
   if (!profile) {
-    throw new Response("Profile not found", {
-      status: 404,
-      headers: {
-        ...Object.fromEntries(headers.entries()),
-        "Cache-Control": "no-store"
-      }
-    });
+    throw new Response(
+      "Profile not found.",
+      {
+        status: 404,
+        headers,
+      },
+    );
   }
 
-  headers.set("Cache-Control", "private, no-store");
+  headers.set(
+    "Cache-Control",
+    "private, no-store",
+  );
 
-  return data({ profile }, { headers });
+  return data(
+    { profile },
+    { headers },
+  );
 }
 
 export function meta({
-  data: routeData
+  data: routeData,
 }: {
-  data?: { profile: PreviewProfile };
+  data?: {
+    profile: PreviewProfile;
+  };
 }) {
   const profile = routeData?.profile;
 
   if (!profile) {
     return [
-      { title: "Profile unavailable — HEYBIO" },
-      { name: "robots", content: "noindex" }
+      {
+        title:
+          "Profile unavailable — HEYBIO",
+      },
     ];
   }
 
@@ -244,19 +363,32 @@ export function meta({
 
   const description =
     profile.bio ||
-    `Discover ${profile.displayName}'s links on HEYBIO.`;
+    `Discover ${profile.displayName}'s world on HEYBIO.`;
 
   return [
     { title },
-    { name: "description", content: description },
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:type", content: "profile" }
+    {
+      name: "description",
+      content: description,
+    },
+    {
+      property: "og:title",
+      content: title,
+    },
+    {
+      property: "og:description",
+      content: description,
+    },
+    {
+      property: "og:type",
+      content: "profile",
+    },
   ];
 }
 
 export default function PublicProfilePage() {
-  const { profile } = useLoaderData<typeof loader>();
+  const { profile } =
+    useLoaderData<typeof loader>();
 
   async function shareProfile() {
     const url = window.location.href;
@@ -264,26 +396,35 @@ export default function PublicProfilePage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${profile.displayName} on HEYBIO`,
-          url
+          title:
+            `${profile.displayName} on HEYBIO`,
+          url,
         });
       } catch {
-        // The visitor may cancel the native share sheet.
+        // Dismissal is not an error.
       }
+
       return;
     }
 
-    if (navigator.clipboard?.writeText) {
+    if (navigator.clipboard) {
       try {
-        await navigator.clipboard.writeText(url);
-        window.alert("Profile link copied.");
+        await navigator.clipboard.writeText(
+          url,
+        );
+        window.alert(
+          "Profile link copied.",
+        );
+        return;
       } catch {
-        window.prompt("Copy profile link:", url);
+        // Provide manual copy fallback.
       }
-      return;
     }
 
-    window.prompt("Copy profile link:", url);
+    window.prompt(
+      "Copy profile link:",
+      url,
+    );
   }
 
   return (
@@ -294,17 +435,23 @@ export default function PublicProfilePage() {
           className="hb-public-page__brand"
           aria-label="HEYBIO homepage"
         >
-          HEYBIO <span aria-hidden="true">↗</span>
+          HEYBIO{" "}
+          <span aria-hidden="true">↗</span>
         </Link>
 
         <div className="hb-public-page__header-actions">
           <button
             type="button"
             className="hb-public-page__share"
-            onClick={() => void shareProfile()}
+            onClick={() =>
+              void shareProfile()
+            }
           >
-            <Share2 size={17} aria-hidden="true" />
-            <span>Share</span>
+            <Share2
+              size={17}
+              aria-hidden="true"
+            />
+            Share
           </button>
         </div>
       </header>
@@ -318,10 +465,16 @@ export default function PublicProfilePage() {
 
       <footer className="hb-public-page__footer">
         <Link to="/">
-          <ArrowLeft size={15} aria-hidden="true" />
+          <ArrowLeft
+            size={15}
+            aria-hidden="true"
+          />
           Discover HEYBIO
         </Link>
-        <span>Your world. One link.</span>
+
+        <span>
+          Your world. One link.
+        </span>
       </footer>
     </main>
   );

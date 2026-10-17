@@ -1,3 +1,4 @@
+import Logo from "../../components/shared/Logo";
 
 import { useState } from "react";
 import {
@@ -215,14 +216,7 @@ export default function LoginPage() {
     <main className="hb-a hb-a--login">
       <div className="hb-a__workspace">
         <header className="hb-a__top">
-          <Link
-            to="/"
-            className="hb-a__logo"
-            aria-label="HEYBIO homepage"
-          >
-            HEYBIO
-            <span aria-hidden="true"> ↗</span>
-          </Link>
+          <Logo size="sm" className="hb-a__logo" />
 
           <span className="hb-a__top-note">
             YOUR WORLD. ONE LINK.

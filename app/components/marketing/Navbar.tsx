@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import "../../styles/heybio-nav.css";
+import Logo from "../shared/Logo";
 
 const navLinks = [
   { label: "Features", href: "/features" },
@@ -43,9 +44,7 @@ export default function Navbar() {
   return (
     <header className="hb-header">
       <div className="hb-header__inner">
-        <a href="/" className="hb-header__logo" aria-label="HEYBIO home" onClick={() => setOpen(false)}>
-          HEYBIO <ArrowUpRight size={23} strokeWidth={2.7} aria-hidden="true" />
-        </a>
+        <Logo size="sm" className="hb-header__logo" />
         <nav className="hb-header__desktop" aria-label="Primary navigation">
           {navLinks.map((link) => <a href={link.href} key={link.href}>{link.label}</a>)}
         </nav>

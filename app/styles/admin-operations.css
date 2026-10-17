@@ -1,0 +1,275 @@
+
+/*
+ * HEYBIO ↗
+ * Admin Operations Design System
+ * By DIPO LABS
+ *
+ * White-first. Minimal. Accessible.
+ * No unnecessary visual effects.
+ */
+
+.hb-ops {
+  display: grid;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 36px;
+  color: #1d1d1f;
+}
+
+.hb-ops__header {
+  display: grid;
+  gap: 10px;
+}
+
+.hb-ops__eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #52535a;
+}
+
+.hb-ops__header h2 {
+  margin: 0;
+  font-size: clamp(1.7rem, 3.8vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.hb-ops__header > p:last-child {
+  margin: 0;
+  max-width: 68ch;
+  line-height: 1.6;
+  color: #55565d;
+}
+
+.hb-ops__card,
+.hb-ops__tile {
+  background: #ffffff;
+  border: 1px solid #e3e3e7;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.hb-ops__card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #ececef;
+}
+
+.hb-ops__card-header > span {
+  color: #55565d;
+  font-size: 0.85rem;
+}
+
+.hb-ops__card a,
+.hb-ops__pager a {
+  color: #1d1d1f;
+  text-underline-offset: 3px;
+}
+
+.hb-ops__empty {
+  margin: 0;
+  padding: 24px 20px;
+  color: #62636a;
+  line-height: 1.6;
+}
+
+.hb-ops__list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.hb-ops__item {
+  padding: 18px 20px;
+  border-bottom: 1px solid #ededf0;
+  min-width: 0;
+}
+
+.hb-ops__item:last-child {
+  border-bottom: 0;
+}
+
+.hb-ops__item-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: start;
+}
+
+.hb-ops__item-top strong {
+  overflow-wrap: anywhere;
+}
+
+.hb-ops__pill {
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: #f5f5f7;
+  font-size: 0.77rem;
+  font-weight: 700;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.hb-ops__message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #404149;
+  line-height: 1.6;
+}
+
+.hb-ops__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #64656b;
+  font-size: 0.85rem;
+  align-items: center;
+}
+
+.hb-ops__scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.hb-ops__table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.hb-ops__table th,
+.hb-ops__table td {
+  text-align: left;
+  padding: 14px 17px;
+  vertical-align: middle;
+  border-bottom: 1px solid #ededf0;
+}
+
+.hb-ops__table th {
+  font-size: 0.76rem;
+  letter-spacing: 0.05em;
+  color: #66676e;
+  background: #f5f5f7;
+}
+
+.hb-ops__table td {
+  overflow-wrap: anywhere;
+}
+
+.hb-ops__table code {
+  font-size: 0.8rem;
+}
+
+.hb-ops__note {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: #5c5d63;
+}
+
+.hb-ops__pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.hb-ops__pager [aria-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.4;
+  text-decoration: none;
+}
+
+.hb-ops__filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.hb-ops__filter select,
+.hb-ops__filter button {
+  border: 1px solid #c9cad0;
+  border-radius: 10px;
+  padding: 10px 13px;
+  font: inherit;
+  background: #ffffff;
+  color: #1d1d1f;
+  min-height: 44px;
+}
+
+.hb-ops__filter button {
+  background: #bdf806;
+  border-color: #bdf806;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.hb-ops__tiles {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(min(100%, 250px), 1fr)
+    );
+  gap: 16px;
+}
+
+.hb-ops__tile {
+  display: grid;
+  gap: 9px;
+  padding: 22px;
+}
+
+.hb-ops__tile > span {
+  color: #5d5e66;
+  font-size: 0.9rem;
+}
+
+.hb-ops__tile > strong {
+  font-size: 1.8rem;
+}
+
+.hb-ops__tile > small {
+  color: #66676e;
+}
+
+.hb-ops
+  :where(a, button, select):focus-visible {
+  outline: 3px solid #1d1d1f;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .hb-ops {
+    gap: 18px;
+  }
+
+  .hb-ops__card-header,
+  .hb-ops__item {
+    padding: 15px;
+  }
+
+  .hb-ops__pager {
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-ops * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

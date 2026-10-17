@@ -1,0 +1,70 @@
+
+/*
+ * HEYBIO ↗
+ * Public creator media details
+ * By DIPO LABS
+ */
+
+.hb-preview-avatar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  object-position: center;
+}
+
+.hb-preview-socials {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 22px auto;
+  max-width: 420px;
+}
+
+.hb-preview-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: inherit;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 650;
+  opacity: 0.9;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.hb-preview-social:hover {
+  opacity: 1;
+}
+
+.hb-preview-social:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .hb-preview-socials {
+    gap: 7px;
+  }
+
+  .hb-preview-social {
+    padding: 9px 10px;
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-preview-social {
+    transition: none;
+  }
+}

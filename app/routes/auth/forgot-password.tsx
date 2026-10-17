@@ -1,3 +1,4 @@
+import Logo from "../../components/shared/Logo";
 import {
   Form,
   Link,
@@ -119,10 +120,7 @@ export default function ForgotPasswordPage() {
   return (
     <main className="auth-page">
       <div className="auth-content">
-        <Link to="/" className="brand">
-          HEYBIO
-          <span className="brand-arrow">↗</span>
-        </Link>
+        <Logo size="sm" className="brand" />
 
         <div className="auth-card">
           <span className="eyebrow">

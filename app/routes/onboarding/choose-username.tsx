@@ -1,3 +1,4 @@
+import Logo from "../../components/shared/Logo";
 import { useEffect, useState } from "react";
 
 import {
@@ -234,9 +235,7 @@ export default function ChooseUsernamePage() {
   return (
     <main className="hb-onboarding">
       <div className="hb-onboarding__card">
-        <a href="/" className="hb-header__logo">
-          HEYBIO<span>↗</span>
-        </a>
+        <Logo size="sm" className="hb-header__logo" />
 
         <div className="hb-onboarding__progress">
           <span>YOUR CREATOR JOURNEY</span>

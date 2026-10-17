@@ -1,3 +1,5 @@
+import Logo from "../shared/Logo";
+
 import {
   ArrowRight,
   ArrowUpRight,
@@ -162,19 +164,7 @@ export default function PremiumFooter() {
 
         <div className="footer-main">
           <div className="footer-brand">
-            <a
-              className="brand brand--footer"
-              href="/"
-              aria-label="HEYBIO homepage"
-            >
-              HEYBIO
-              <span
-                className="brand-arrow"
-                aria-hidden="true"
-              >
-                ↗
-              </span>
-            </a>
+            <Logo size="lg" variant="light" className="brand brand--footer" />
 
             <p className="footer-brand__tagline">
               Your world. One link.

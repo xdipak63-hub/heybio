@@ -1,6 +1,7 @@
 
 import { useEffect, useRef } from "react";
 import { Link, NavLink } from "react-router";
+import Logo from "../shared/Logo";
 import {
   Activity,
   BarChart3,
@@ -86,13 +87,7 @@ export default function AdminSidebar({
         aria-label="Admin sidebar"
       >
         <div className="hb-admin-sidebar__brand">
-          <Link
-            to="/admin"
-            className="hb-admin-sidebar__logo"
-            onClick={onClose}
-          >
-            HEYBIO <span aria-hidden="true">↗</span>
-          </Link>
+          <Logo href="/admin" size="sm" className="hb-admin-sidebar__logo" />
 
           <button
             ref={closeButtonRef}

@@ -1,3 +1,4 @@
+import Logo from "../shared/Logo";
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -331,13 +332,7 @@ export default function IntroExperience() {
       >
         <div className="hb-journey__canvas">
           <header className="hb-journey__header">
-            <div
-              className="hb-journey__logo"
-              aria-label="HEYBIO by DIPO LABS"
-            >
-              HEYBIO
-              <ArrowUpRight size={24} aria-hidden="true" />
-            </div>
+            <Logo size="sm" href="" className="hb-journey__logo" />
 
             <div className="hb-journey__header-right">
               <span className="hb-journey__header-tag">

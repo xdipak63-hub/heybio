@@ -1,0 +1,71 @@
+
+/*
+ * HEYBIO ↗
+ * Official brand surfaces
+ *
+ * White      #FFFFFF
+ * Soft White #F5F5F7
+ * Charcoal   #1D1D1F
+ * Lime       #BDF806
+ * Ice Blue   #9FE7F5
+ */
+
+:root {
+  --hb-color-white: #FFFFFF;
+  --hb-color-surface: #F5F5F7;
+  --hb-color-ink: #1D1D1F;
+  --hb-color-lime: #BDF806;
+  --hb-color-ice: #9FE7F5;
+
+  --hb-border: #E2E3E7;
+  --hb-muted: #575960;
+
+  --hb-radius-sm: 10px;
+  --hb-radius-md: 16px;
+  --hb-radius-lg: 24px;
+
+  --hb-shadow-soft:
+    0 12px 35px rgb(29 29 31 / 6%);
+}
+
+.hb-surface {
+  background: var(--hb-color-white);
+  color: var(--hb-color-ink);
+}
+
+.hb-surface-subtle {
+  background: var(--hb-color-surface);
+  color: var(--hb-color-ink);
+}
+
+.hb-panel {
+  background: var(--hb-color-white);
+  border: 1px solid var(--hb-border);
+  border-radius: var(--hb-radius-md);
+}
+
+.hb-text-muted {
+  color: var(--hb-muted);
+}
+
+.hb-accent-fill {
+  background: var(--hb-color-lime);
+  color: var(--hb-color-ink);
+}
+
+.hb-accent-ice {
+  background: var(--hb-color-ice);
+  color: var(--hb-color-ink);
+}
+
+.hb-panel
+  :where(
+    a,
+    button,
+    input,
+    select,
+    textarea
+  ):focus-visible {
+  outline: 3px solid var(--hb-color-ink);
+  outline-offset: 3px;
+}
