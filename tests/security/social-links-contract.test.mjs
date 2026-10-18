@@ -59,12 +59,12 @@ test(
   () => {
     assert.match(
       api,
-      /\brequireCsrfProtection\s*\(\s*request\s*\)/,
+      /\brequireCsrfProtection\s*\(\s*request\s*,?\s*\)/,
     );
 
     assert.match(
       api,
-      /\brequireMutationMethod\s*\(\s*request\s*,\s*\[\s*["']POST["']\s*\]\s*\)/,
+      /\brequireMutationMethod\s*\(\s*request\s*,\s*\[\s*["']POST["']\s*\]\s*,?\s*\)/,
     );
 
     assert.match(
@@ -79,12 +79,12 @@ test(
   () => {
     assert.match(
       api,
-      /["']save_my_social_links["']/,
+      /["']save_my_social_links(?:_versioned)?["']/,
     );
 
     assert.match(
       api,
-      /\bp_links\s*:\s*links\b/,
+      /\bp_links\s*:\s*validated\.links\b/,
     );
   },
 );

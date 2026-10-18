@@ -208,6 +208,9 @@ type Pages = {
   "/api/social-links": {
     params: {};
   };
+  "/social-links": {
+    params: {};
+  };
   "/api/uploads": {
     params: {};
   };
@@ -244,6 +247,9 @@ type Pages = {
   "/api/hype-entitlement": {
     params: {};
   };
+  "/api/hype-launch": {
+    params: {};
+  };
   "/api/admin-actions": {
     params: {};
   };
@@ -268,7 +274,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/pricing" | "/features" | "/explore" | "/templates" | "/whats-new" | "/news" | "/about-heybio" | "/about-dipolabs" | "/our-story" | "/contact" | "/terms" | "/privacy" | "/cookies" | "/community-guidelines" | "/refund-policy" | "/cancellation-policy" | "/support/help-center" | "/support/faqs" | "/support/getting-started" | "/support/report-problem" | "/support/submit-ticket" | "/signup" | "/login" | "/auth/callback" | "/logout" | "/forgot-password" | "/reset-password" | "/verify-email" | "/auth/mfa-setup" | "/auth/mfa-verify" | "/onboarding/choose-username" | "/onboarding/choose-plan" | "/onboarding/create-profile" | "/onboarding/choose-template" | "/onboarding/complete" | "/dashboard" | "/dashboard/links" | "/dashboard/appearance" | "/dashboard/preview" | "/dashboard/share" | "/dashboard/more" | "/dashboard/billing" | "/dashboard/payment-history" | "/dashboard/hype-drop" | "/dashboard/security" | "/dashboard/settings" | "/dashboard/integrations" | "/dashboard/analytics" | "/dashboard/audience" | "/admin" | "/admin/users" | "/admin/users/:userId" | "/admin/profiles" | "/admin/subscriptions" | "/admin/payments" | "/admin/revenue" | "/admin/audit-logs" | "/admin/reports" | "/admin/refunds" | "/admin/hype-access" | "/admin/support" | "/admin/security" | "/admin/settings" | "/api/social-links" | "/api/uploads" | "/api/profile" | "/api/links" | "/api/billing-portal" | "/api/username-availability" | "/api/checkout" | "/api/payment-verify" | "/api/billing-status" | "/api/billing-change" | "/api/subscription-cancel" | "/api/razorpay-webhook" | "/api/hype-entitlement" | "/api/admin-actions" | "/api/support-ticket" | "/api/analytics" | "/api/public-avatar/:username" | "/:username";
+    page: "/" | "/pricing" | "/features" | "/explore" | "/templates" | "/whats-new" | "/news" | "/about-heybio" | "/about-dipolabs" | "/our-story" | "/contact" | "/terms" | "/privacy" | "/cookies" | "/community-guidelines" | "/refund-policy" | "/cancellation-policy" | "/support/help-center" | "/support/faqs" | "/support/getting-started" | "/support/report-problem" | "/support/submit-ticket" | "/signup" | "/login" | "/auth/callback" | "/logout" | "/forgot-password" | "/reset-password" | "/verify-email" | "/auth/mfa-setup" | "/auth/mfa-verify" | "/onboarding/choose-username" | "/onboarding/choose-plan" | "/onboarding/create-profile" | "/onboarding/choose-template" | "/onboarding/complete" | "/dashboard" | "/dashboard/links" | "/dashboard/appearance" | "/dashboard/preview" | "/dashboard/share" | "/dashboard/more" | "/dashboard/billing" | "/dashboard/payment-history" | "/dashboard/hype-drop" | "/dashboard/security" | "/dashboard/settings" | "/dashboard/integrations" | "/dashboard/analytics" | "/dashboard/audience" | "/admin" | "/admin/users" | "/admin/users/:userId" | "/admin/profiles" | "/admin/subscriptions" | "/admin/payments" | "/admin/revenue" | "/admin/audit-logs" | "/admin/reports" | "/admin/refunds" | "/admin/hype-access" | "/admin/support" | "/admin/security" | "/admin/settings" | "/api/social-links" | "/social-links" | "/api/uploads" | "/api/profile" | "/api/links" | "/api/billing-portal" | "/api/username-availability" | "/api/checkout" | "/api/payment-verify" | "/api/billing-status" | "/api/billing-change" | "/api/subscription-cancel" | "/api/razorpay-webhook" | "/api/hype-entitlement" | "/api/hype-launch" | "/api/admin-actions" | "/api/support-ticket" | "/api/analytics" | "/api/public-avatar/:username" | "/:username";
   };
   "routes/marketing/home.tsx": {
     id: "routes/marketing/home";
@@ -538,6 +544,10 @@ type RouteFiles = {
     id: "routes/api/social-links";
     page: "/api/social-links";
   };
+  "routes/dashboard/social-links.tsx": {
+    id: "routes/dashboard/social-links";
+    page: "/social-links";
+  };
   "routes/api/uploads.ts": {
     id: "routes/api/uploads";
     page: "/api/uploads";
@@ -585,6 +595,10 @@ type RouteFiles = {
   "routes/api/hype-entitlement.ts": {
     id: "routes/api/hype-entitlement";
     page: "/api/hype-entitlement";
+  };
+  "routes/api/hype-launch.ts": {
+    id: "routes/api/hype-launch";
+    page: "/api/hype-launch";
   };
   "routes/api/admin-actions.ts": {
     id: "routes/api/admin-actions";
@@ -677,6 +691,7 @@ type RouteModules = {
   "routes/admin/security": typeof import("./app/routes/admin/security.tsx");
   "routes/admin/settings": typeof import("./app/routes/admin/settings.tsx");
   "routes/api/social-links": typeof import("./app/routes/api/social-links.ts");
+  "routes/dashboard/social-links": typeof import("./app/routes/dashboard/social-links.tsx");
   "routes/api/uploads": typeof import("./app/routes/api/uploads.ts");
   "routes/api/profile": typeof import("./app/routes/api/profile.ts");
   "routes/api/links": typeof import("./app/routes/api/links.ts");
@@ -689,6 +704,7 @@ type RouteModules = {
   "routes/api/subscription-cancel": typeof import("./app/routes/api/subscription-cancel.ts");
   "routes/api/razorpay-webhook": typeof import("./app/routes/api/razorpay-webhook.ts");
   "routes/api/hype-entitlement": typeof import("./app/routes/api/hype-entitlement.ts");
+  "routes/api/hype-launch": typeof import("./app/routes/api/hype-launch.ts");
   "routes/api/admin-actions": typeof import("./app/routes/api/admin-actions.ts");
   "routes/api/support-ticket": typeof import("./app/routes/api/support-ticket.ts");
   "routes/api/analytics": typeof import("./app/routes/api/analytics.ts");

@@ -110,3 +110,4 @@ local-backups/
 .deploy/
 .temp/
 tmp/
+build.log

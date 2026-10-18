@@ -23,6 +23,6 @@
     ]
   },
   "vars": {
-    "BILLING_JOBS_ENABLED": "false"
+    "BILLING_JOBS_ENABLED": "true"
   }
 }
