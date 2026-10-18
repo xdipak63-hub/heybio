@@ -328,3 +328,1008 @@
     transition: none;
   }
 }
+
+/* ==========================================================
+   HEYBIO — PHASE 1N
+   Premium responsive workspace navigation
+   ========================================================== */
+
+.hb-dash {
+  --hb-nav-ink: #1d1d1f;
+  --hb-nav-lime: #bdf806;
+  --hb-nav-ice: #9fe7f5;
+  --hb-nav-white: #ffffff;
+  --hb-nav-soft: #f5f5f7;
+  --hb-nav-border: #e5e5e9;
+  isolation: isolate;
+}
+
+.hb-dash *,
+.hb-dash *::before,
+.hb-dash *::after {
+  box-sizing: border-box;
+}
+
+/* Desktop sidebar */
+
+.hb-dash__sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: #d5d5da transparent;
+  overscroll-behavior: contain;
+}
+
+.hb-dash__nav-link {
+  position: relative;
+  min-width: 0;
+  outline-offset: 3px;
+}
+
+.hb-dash__nav-link > span {
+  min-width: 0;
+}
+
+.hb-dash__nav-link svg {
+  flex-shrink: 0;
+}
+
+.hb-dash__nav-link:focus-visible,
+.hb-dash__public-link:focus-visible,
+.hb-dash__menu:focus-visible,
+.hb-dash__close:focus-visible {
+  outline: 3px solid var(--hb-nav-ink);
+  outline-offset: 3px;
+}
+
+.hb-dash__nav-link.is-active {
+  background: #eafbbd;
+  color: var(--hb-nav-ink);
+}
+
+.hb-dash__nav-link:hover:not(.is-active) {
+  background: var(--hb-nav-soft);
+}
+
+/* Dedicated HYPE DROP navigation treatment */
+
+.hb-dash__nav-link[href="/dashboard/hype-drop"] {
+  border: 1px solid transparent;
+}
+
+.hb-dash__nav-link[href="/dashboard/hype-drop"]:hover {
+  border-color: var(--hb-nav-ink);
+}
+
+.hb-dash__nav-link[href="/dashboard/hype-drop"].is-active {
+  box-shadow: inset 0 0 0 1px var(--hb-nav-ink);
+}
+
+/* Prevent wide dashboard content from
+   creating horizontal overflow. */
+
+.hb-dash__main,
+.hb-dash__content {
+  min-width: 0;
+}
+
+.hb-dash__content > * {
+  min-width: 0;
+}
+
+.hb-dash__topbar-label {
+  min-width: 0;
+}
+
+/* Mobile bottom navigation */
+
+@media (max-width: 900px) {
+  .hb-dash {
+    min-height: 100dvh;
+    overflow-x: clip;
+  }
+
+  .hb-dash__sidebar {
+    z-index: 110;
+    padding-top:
+      max(24px, env(safe-area-inset-top));
+    padding-bottom:
+      max(24px, env(safe-area-inset-bottom));
+    box-shadow: 16px 0 48px rgb(29 29 31 / 10%);
+  }
+
+  .hb-dash__backdrop {
+    z-index: 100;
+    background: rgb(29 29 31 / 52%);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hb-dash__topbar {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hb-dash__content {
+    padding-bottom:
+      calc(112px + env(safe-area-inset-bottom));
+  }
+
+  .hb-creator-mobile-nav {
+    position: fixed;
+    z-index: 80;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: grid;
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+    align-items: stretch;
+
+    gap: 2px;
+
+    padding:
+      8px max(8px, env(safe-area-inset-right))
+      calc(8px + env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+
+    background: var(--hb-nav-white);
+    border-top: 1px solid var(--hb-nav-border);
+    box-shadow: 0 -8px 30px rgb(29 29 31 / 5%);
+  }
+
+  .hb-creator-mobile-nav__item {
+    min-width: 0;
+    min-height: 54px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 5px;
+    padding: 7px 2px;
+
+    border-radius: 13px;
+    color: #62636a;
+
+    text-align: center;
+    text-decoration: none;
+
+    font-size: 10px;
+    line-height: 1.15;
+    font-weight: 600;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+      color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .hb-creator-mobile-nav__item svg {
+    flex-shrink: 0;
+  }
+
+  .hb-creator-mobile-nav__item span {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .hb-creator-mobile-nav__item:hover {
+    color: var(--hb-nav-ink);
+    background: var(--hb-nav-soft);
+  }
+
+  .hb-creator-mobile-nav__item.is-active {
+    color: var(--hb-nav-ink);
+    background: #eafbbd;
+    font-weight: 800;
+  }
+
+  .hb-creator-mobile-nav__item[href="/dashboard/hype-drop"].is-active {
+    background: var(--hb-nav-lime);
+  }
+
+  .hb-creator-mobile-nav__item:focus-visible {
+    outline: 3px solid var(--hb-nav-ink);
+    outline-offset: -3px;
+  }
+
+  .hb-creator-mobile-nav__item:active {
+    transform: scale(0.96);
+  }
+}
+
+/* Compact phones */
+
+@media (max-width: 390px) {
+  .hb-dash__topbar {
+    gap: 8px;
+    padding-inline: 10px;
+  }
+
+  .hb-dash__topbar-label strong {
+    font-size: 13px;
+  }
+
+  .hb-dash__topbar-label span {
+    font-size: 11px;
+  }
+
+  .hb-dash__topbar-actions {
+    gap: 8px;
+  }
+
+  .hb-creator-mobile-nav {
+    gap: 0;
+    padding-left:
+      max(4px, env(safe-area-inset-left));
+    padding-right:
+      max(4px, env(safe-area-inset-right));
+  }
+
+  .hb-creator-mobile-nav__item {
+    font-size: 9px;
+    padding-inline: 1px;
+  }
+
+  .hb-creator-mobile-nav__item svg {
+    width: 19px;
+    height: 19px;
+  }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-creator-mobile-nav__item {
+    transition: none;
+  }
+
+  .hb-creator-mobile-nav__item:active {
+    transform: none;
+  }
+}
+
+
+/* ==========================================================
+   HEYBIO by DIPO LABS
+   PHASE 1O — DASHBOARD EXPERIENCE POLISH
+
+   Append after Phase 1N.
+   No existing rules need to be deleted.
+   ========================================================== */
+
+/* Smooth layout without horizontal page overflow */
+
+.hb-dash {
+  min-width: 0;
+  min-height: 100dvh;
+}
+
+.hb-dash__main {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.hb-dash__content {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Premium topbar */
+
+.hb-dash__topbar {
+  position: relative;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e9;
+}
+
+.hb-dash__topbar-label strong {
+  color: #1d1d1f;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.hb-dash__topbar-label span {
+  color: #64656b;
+}
+
+.hb-dash__topbar-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 15px;
+  border-radius: 12px;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.hb-dash__topbar-actions a:hover {
+  background: #bdf806;
+}
+
+.hb-dash__topbar-actions a:active {
+  transform: scale(0.98);
+}
+
+/* Account identity */
+
+.hb-dash__account {
+  border: 1px solid #ebebee;
+  background: #f5f5f7;
+  transition: border-color 160ms ease;
+}
+
+.hb-dash__account:hover {
+  border-color: #d3d3d8;
+}
+
+.hb-dash__avatar {
+  background: #bdf806;
+  color: #1d1d1f;
+  font-size: 18px;
+  letter-spacing: -0.04em;
+}
+
+.hb-dash__account-copy strong {
+  color: #1d1d1f;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* Responsive cards and media */
+
+.hb-dash__content img,
+.hb-dash__content video,
+.hb-dash__content canvas {
+  max-width: 100%;
+}
+
+.hb-dash__content :where(
+  input,
+  textarea,
+  select
+) {
+  max-width: 100%;
+}
+
+/* Accessible loading state.
+   aria-busy already exists in dashboard layout. */
+
+.hb-dash__content[aria-busy="true"]::before {
+  content: "";
+  position: fixed;
+  z-index: 75;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #bdf806;
+  animation: hb-dashboard-loading 1.1s ease-in-out infinite;
+  transform-origin: left;
+  pointer-events: none;
+}
+
+@keyframes hb-dashboard-loading {
+  0% {
+    transform: scaleX(0.08);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scaleX(0.6);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scaleX(1);
+    opacity: 0.6;
+  }
+}
+
+/* Tablets and compact desktops */
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  .hb-dash {
+    grid-template-columns: 228px minmax(0, 1fr);
+  }
+
+  .hb-dash__sidebar {
+    padding-inline: 12px;
+  }
+
+  .hb-dash__topbar {
+    padding-inline: 24px;
+  }
+
+  .hb-dash__content {
+    padding-inline: 24px;
+  }
+}
+
+/* Mobile layout */
+
+@media (max-width: 900px) {
+  .hb-dash__main {
+    min-height: 100dvh;
+  }
+
+  .hb-dash__topbar {
+    min-height: 70px;
+    gap: 10px;
+    padding:
+      10px
+      max(14px, env(safe-area-inset-right))
+      10px
+      max(14px, env(safe-area-inset-left));
+  }
+
+  .hb-dash__menu {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    background: #f5f5f7;
+    color: #1d1d1f;
+  }
+
+  .hb-dash__menu:hover {
+    background: #eafbbd;
+  }
+
+  .hb-dash__topbar-label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hb-dash__topbar-label strong,
+  .hb-dash__topbar-label span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .hb-dash__topbar-actions {
+    flex-shrink: 0;
+    margin-left: auto;
+    gap: 8px;
+  }
+
+  .hb-dash__topbar-actions a {
+    min-height: 40px;
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+
+  .hb-dash__content {
+    padding:
+      20px
+      max(14px, env(safe-area-inset-right))
+      calc(120px + env(safe-area-inset-bottom))
+      max(14px, env(safe-area-inset-left));
+  }
+
+  .hb-dash__sidebar {
+    max-width: calc(100vw - 24px);
+  }
+
+  .hb-dash__sidebar-bottom {
+    padding-bottom: 12px;
+  }
+
+  .hb-dash__public-link,
+  .hb-dash__logout {
+    min-height: 44px;
+  }
+
+  .hb-dash__logout {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+/* Very small phones */
+
+@media (max-width: 360px) {
+  .hb-dash__topbar {
+    gap: 6px;
+    padding-inline: 8px;
+  }
+
+  .hb-dash__topbar-label span {
+    display: none;
+  }
+
+  .hb-dash__topbar-label strong {
+    font-size: 12px;
+  }
+
+  .hb-dash__topbar-actions a {
+    min-height: 38px;
+    padding-inline: 9px;
+    font-size: 11px;
+  }
+
+  .hb-dash__content {
+    padding-inline: 10px;
+  }
+}
+
+/* Keyboard navigation */
+
+.hb-dash__topbar-actions a:focus-visible,
+.hb-dash__menu:focus-visible,
+.hb-dash__logout:focus-visible {
+  outline: 3px solid #1d1d1f;
+  outline-offset: 3px;
+}
+
+/* Respect accessibility preferences */
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-dash__content[aria-busy="true"]::before {
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+
+  .hb-dash__topbar-actions a,
+  .hb-dash__account {
+    transition: none;
+  }
+
+  .hb-dash__topbar-actions a:active {
+    transform: none;
+  }
+}
+
+
+/* ==========================================================
+   HEYBIO — PHASE 1P
+   Premium Creator Dashboard Overview
+   ========================================================== */
+
+.hb-overview-hero {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.5fr)
+    minmax(240px, 0.75fr);
+  align-items: center;
+  gap: clamp(20px, 4vw, 48px);
+  padding: clamp(25px, 5vw, 48px);
+  background: #ffffff;
+  border: 1px solid #e5e5e9;
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.hb-overview-hero__copy h1 {
+  margin: 16px 0;
+  font-size: clamp(35px, 5vw, 62px);
+  letter-spacing: -0.065em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+}
+
+.hb-overview-hero__copy h1 span {
+  color: #a5d900;
+}
+
+.hb-overview-hero__copy > p {
+  max-width: 510px;
+  margin: 0;
+  color: #62636a;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.hb-overview-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.hb-overview-hero__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 30px 20px;
+  border: 1px solid #e5e5e9;
+  border-radius: 24px;
+  background: #f5f5f7;
+  text-align: center;
+}
+
+.hb-overview-hero__avatar {
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  border-radius: 24px;
+  background: #bdf806;
+  color: #1d1d1f;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.hb-overview-hero__identity strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 18px;
+}
+
+.hb-overview-hero__identity > span {
+  max-width: 260px;
+  color: #66676d;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.hb-overview-hero__verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border-radius: 100px;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hb-overview-section {
+  margin-top: 32px;
+}
+
+.hb-overview-section__heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.hb-overview-section__heading h2 {
+  margin: 7px 0 0;
+  font-size: clamp(23px, 3vw, 30px);
+  letter-spacing: -0.045em;
+}
+
+.hb-overview-section__note {
+  color: #686971;
+  font-size: 12px;
+}
+
+.hb-dash-overview-stats {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.hb-dash-overview-stat {
+  min-width: 0;
+  padding: 23px;
+  border: 1px solid #e5e5e9;
+  border-radius: 21px;
+  background: #ffffff;
+}
+
+.hb-dash-overview-stat__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.hb-dash-overview-stat__top > span:first-child {
+  font-size: 13px;
+  color: #66676d;
+  font-weight: 600;
+}
+
+.hb-dash-overview-stat__icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #f5f5f7;
+}
+
+.hb-dash-overview-stat > strong {
+  display: block;
+  margin: 12px 0 8px;
+  font-size: clamp(25px, 3vw, 34px);
+  letter-spacing: -0.055em;
+  overflow-wrap: anywhere;
+}
+
+.hb-dash-overview-stat > p {
+  margin: 0;
+  color: #686971;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.hb-overview-membership {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 17px;
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid #e5e5e9;
+  border-radius: 20px;
+  background: #ffffff;
+}
+
+.hb-overview-membership__icon {
+  display: grid;
+  place-items: center;
+  width: 49px;
+  height: 49px;
+  flex-shrink: 0;
+  border-radius: 15px;
+  background: #bdf806;
+}
+
+.hb-overview-membership__copy {
+  flex: 1 1 190px;
+  min-width: 0;
+}
+
+.hb-overview-membership__copy h2 {
+  margin: 6px 0;
+  font-size: 21px;
+  letter-spacing: -0.04em;
+}
+
+.hb-overview-membership__copy p {
+  margin: 0;
+  color: #686971;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.hb-dash-overview-tools {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.hb-dash-overview-tool {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 195px;
+  padding: 23px;
+  border: 1px solid #e5e5e9;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #1d1d1f;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease;
+}
+
+.hb-dash-overview-tool:hover {
+  transform: translateY(-3px);
+  border-color: #1d1d1f;
+}
+
+.hb-dash-overview-tool__icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  background: #f5f5f7;
+}
+
+.hb-dash-overview-tool h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  letter-spacing: -0.025em;
+}
+
+.hb-dash-overview-tool p {
+  margin: 0 0 20px;
+  color: #686971;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.hb-dash-overview-tool__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: auto;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.hb-overview-hype {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
+  padding: clamp(24px, 4vw, 40px);
+  overflow: hidden;
+  border: 1px solid #d9e8aa;
+  border-radius: 26px;
+  background: #f4fbdc;
+}
+
+.hb-overview-hype__symbol {
+  display: grid;
+  place-items: center;
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+  border-radius: 17px;
+  background: #bdf806;
+}
+
+.hb-overview-hype__content {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  max-width: 610px;
+}
+
+.hb-overview-hype__eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.hb-overview-hype h2 {
+  margin: 10px 0;
+  font-size: clamp(30px, 5vw, 49px);
+  letter-spacing: -0.07em;
+}
+
+.hb-overview-hype h2 span {
+  color: #83b900;
+}
+
+.hb-overview-hype__content > strong {
+  display: block;
+  font-size: 15px;
+}
+
+.hb-overview-hype__content > p {
+  margin: 12px 0 18px;
+  color: #55565d;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.hb-overview-hype__status,
+.hb-overview-hype__notice {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.hb-overview-hype__notice {
+  margin-top: 12px;
+  color: #62636a;
+  font-weight: 500;
+}
+
+.hb-overview-hype__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 13px 18px;
+  border-radius: 13px;
+  background: #1d1d1f;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.hb-overview-hype__link:hover {
+  background: #343439;
+}
+
+.hb-overview-hype__decoration {
+  position: absolute;
+  right: 28px;
+  top: 22px;
+  opacity: 0.13;
+  pointer-events: none;
+}
+
+@media (max-width: 1100px) {
+  .hb-overview-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hb-dash-overview-tools {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .hb-dash-overview-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .hb-overview-hero__identity {
+    padding: 24px 18px;
+  }
+
+  .hb-overview-hype {
+    flex-direction: column;
+  }
+
+  .hb-overview-hype__decoration {
+    right: -25px;
+    top: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hb-overview-hero {
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .hb-overview-hero__actions {
+    flex-direction: column;
+  }
+
+  .hb-overview-hero__actions > * {
+    justify-content: center;
+  }
+
+  .hb-dash-overview-stats,
+  .hb-dash-overview-tools {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hb-overview-membership {
+    align-items: flex-start;
+  }
+
+  .hb-overview-membership > a {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-dash-overview-tool {
+    transition: none;
+  }
+
+  .hb-dash-overview-tool:hover {
+    transform: none;
+  }
+}

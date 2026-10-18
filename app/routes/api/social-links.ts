@@ -1,17 +1,43 @@
 
 import type {
   ActionFunctionArgs,
-  LoaderFunctionArgs
+  LoaderFunctionArgs,
 } from "react-router";
 
 import {
-  requireUser
+  requireUser,
 } from "../../lib/auth/require-user.server";
 
 import {
   requireCsrfProtection,
-  requireMutationMethod
+  requireMutationMethod,
 } from "../../lib/security/csrf.server";
+
+/**
+ * HEYBIO — Phase 1W
+ *
+ * Revision-aware social links API.
+ *
+ * Requires migration 032:
+ * save_my_social_links_versioned(jsonb, bigint)
+ *
+ * POST contract:
+ * {
+ *   expectedRevision: number,
+ *   links: SocialInput[]
+ * }
+ *
+ * Success:
+ * { ok: true, revision: number }
+ *
+ * Stale save:
+ * HTTP 409
+ * { error: "SOCIAL_LINKS_CONFLICT" }
+ */
+
+const MAX_LINKS = 12;
+const MAX_URL_LENGTH = 2048;
+const MAX_BODY_BYTES = 16_384;
 
 const PLATFORMS = new Set([
   "instagram",
@@ -25,7 +51,7 @@ const PLATFORMS = new Set([
   "pinterest",
   "snapchat",
   "twitch",
-  "website"
+  "website",
 ]);
 
 type SocialInput = {
@@ -34,18 +60,91 @@ type SocialInput = {
   is_visible: boolean;
 };
 
-function validate(
-  input: unknown
-): SocialInput[] | null {
+type SaveBody = {
+  expectedRevision: number;
+  links: SocialInput[];
+};
+
+function makeHeaders(
+  source: Headers,
+): Headers {
+  const headers = new Headers(source);
+
+  headers.set(
+    "Cache-Control",
+    "private, no-store, max-age=0",
+  );
+
+  headers.set(
+    "X-Content-Type-Options",
+    "nosniff",
+  );
+
+  headers.set(
+    "X-Robots-Tag",
+    "noindex, nofollow",
+  );
+
+  headers.set("Vary", "Cookie");
+
+  return headers;
+}
+
+function errorResponse(
+  message: string,
+  status: number,
+  headers: Headers,
+): Response {
+  return Response.json(
+    { error: message },
+    { status, headers },
+  );
+}
+
+function normalizeUrl(
+  value: string,
+): string | null {
+  const raw = value.trim();
+
   if (
-    !Array.isArray(input) ||
-    input.length > 12
+    raw.length < 10 ||
+    raw.length > MAX_URL_LENGTH ||
+    /[\s\\\u0000-\u001f\u007f]/.test(raw)
   ) {
     return null;
   }
 
-  const result: SocialInput[] = [];
+  try {
+    const url = new URL(raw);
+
+    if (
+      url.protocol !== "https:" ||
+      !url.hostname ||
+      url.username ||
+      url.password ||
+      url.href.length > MAX_URL_LENGTH
+    ) {
+      return null;
+    }
+
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+function validateLinks(
+  input: unknown,
+): SocialInput[] | null {
+  if (
+    !Array.isArray(input) ||
+    input.length > MAX_LINKS
+  ) {
+    return null;
+  }
+
   const seen = new Set<string>();
+  const links: SocialInput[] = [];
 
   for (const item of input) {
     if (
@@ -56,179 +155,363 @@ function validate(
       return null;
     }
 
-    const value = item as Record<string, unknown>;
+    const record = item as Record<
+      string,
+      unknown
+    >;
 
     if (
-      typeof value.platform !== "string" ||
-      !PLATFORMS.has(value.platform) ||
-      seen.has(value.platform) ||
-      typeof value.url !== "string" ||
-      typeof value.is_visible !== "boolean"
+      typeof record.platform !== "string" ||
+      !PLATFORMS.has(record.platform) ||
+      seen.has(record.platform) ||
+      typeof record.url !== "string" ||
+      typeof record.is_visible !== "boolean"
     ) {
       return null;
     }
 
-    const raw = value.url.trim();
+    const url = normalizeUrl(
+      record.url,
+    );
 
-    if (
-      raw.length < 10 ||
-      raw.length > 2048 ||
-      /[\s\\]/.test(raw)
-    ) {
-      return null;
-    }
+    if (!url) return null;
 
-    let url: URL;
+    seen.add(record.platform);
 
-    try {
-      url = new URL(raw);
-    } catch {
-      return null;
-    }
-
-    if (
-      url.protocol !== "https:" ||
-      !url.hostname ||
-      url.username ||
-      url.password ||
-      url.href.length > 2048
-    ) {
-      return null;
-    }
-
-    seen.add(value.platform);
-
-    result.push({
-      platform: value.platform,
-      url: url.href,
-      is_visible: value.is_visible
+    links.push({
+      platform: record.platform,
+      url,
+      is_visible: record.is_visible,
     });
   }
 
-  return result;
+  return links;
 }
 
-const jsonHeaders = {
-  "Cache-Control": "private, no-store",
-  "Content-Type": "application/json"
-};
+function validateBody(
+  input: unknown,
+): SaveBody | null {
+  if (
+    !input ||
+    typeof input !== "object" ||
+    Array.isArray(input)
+  ) {
+    return null;
+  }
+
+  const record = input as Record<
+    string,
+    unknown
+  >;
+
+  const expectedRevision =
+    record.expectedRevision;
+
+  if (
+    typeof expectedRevision !== "number" ||
+    !Number.isSafeInteger(
+      expectedRevision,
+    ) ||
+    expectedRevision < 0
+  ) {
+    return null;
+  }
+
+  const links = validateLinks(
+    record.links,
+  );
+
+  if (!links) return null;
+
+  return {
+    expectedRevision,
+    links,
+  };
+}
+
+async function readBody(
+  request: Request,
+): Promise<unknown> {
+  const type = request.headers
+    .get("content-type")
+    ?.split(";")[0]
+    ?.trim()
+    .toLowerCase();
+
+  if (type !== "application/json") {
+    throw new Error(
+      "Unsupported content type",
+    );
+  }
+
+  const declaredLength =
+    request.headers.get(
+      "content-length",
+    );
+
+  if (declaredLength !== null) {
+    const length = Number(
+      declaredLength,
+    );
+
+    if (
+      !Number.isSafeInteger(length) ||
+      length < 0 ||
+      length > MAX_BODY_BYTES
+    ) {
+      throw new Error(
+        "Invalid request length",
+      );
+    }
+  }
+
+  if (!request.body) {
+    throw new Error(
+      "Missing request body",
+    );
+  }
+
+  const reader =
+    request.body.getReader();
+
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+
+  try {
+    while (true) {
+      const { done, value } =
+        await reader.read();
+
+      if (done) break;
+
+      size += value.byteLength;
+
+      if (size > MAX_BODY_BYTES) {
+        await reader.cancel();
+
+        throw new Error(
+          "Request body too large",
+        );
+      }
+
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bytes =
+    new Uint8Array(size);
+
+  let offset = 0;
+
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  const text = new TextDecoder(
+    "utf-8",
+    { fatal: true },
+  ).decode(bytes);
+
+  return JSON.parse(text) as unknown;
+}
 
 export async function loader({
   request,
-  context
+  context,
 }: LoaderFunctionArgs) {
   const { user, client } =
-    await requireUser(request, context);
+    await requireUser(
+      request,
+      context,
+    );
 
-  const { data, error } =
-    await client.supabase
-      .from("social_links")
-      .select(
-        "id, platform, url, position, is_visible"
-      )
-      .eq("user_id", user.id)
-      .order("position", { ascending: true });
+  const headers = makeHeaders(
+    client.headers,
+  );
 
-  if (error) {
-    return Response.json(
-      { error: "Unable to load social links." },
-      {
-        status: 503,
-        headers: client.headers
-      }
+  const [linksResult, revisionResult] =
+    await Promise.all([
+      client.supabase
+        .from("social_links")
+        .select(
+          "id,platform,url,position,is_visible",
+        )
+        .eq("user_id", user.id)
+        .order("position", {
+          ascending: true,
+        }),
+
+      client.supabase
+        .from("social_links_revisions")
+        .select("revision")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]);
+
+  if (
+    linksResult.error ||
+    revisionResult.error
+  ) {
+    console.error(
+      "Social links GET failed",
+      linksResult.error?.code,
+      revisionResult.error?.code,
+    );
+
+    return errorResponse(
+      "Unable to load social links.",
+      503,
+      headers,
+    );
+  }
+
+  const revision =
+    revisionResult.data?.revision ?? 0;
+
+  if (
+    typeof revision !== "number" ||
+    !Number.isSafeInteger(revision) ||
+    revision < 0
+  ) {
+    return errorResponse(
+      "Invalid social links revision.",
+      503,
+      headers,
     );
   }
 
   return Response.json(
-    { links: data ?? [] },
     {
-      headers: new Headers([
-        ...client.headers,
-        ...Object.entries(jsonHeaders)
-      ])
-    }
+      links: linksResult.data ?? [],
+      revision,
+    },
+    { headers },
   );
 }
 
 export async function action({
   request,
-  context
+  context,
 }: ActionFunctionArgs) {
-  requireMutationMethod(request, ["POST"]);
-  requireCsrfProtection(request);
-
-  const { client } =
-    await requireUser(request, context);
-
-  const length = Number(
-    request.headers.get("content-length") ?? 0
+  requireMutationMethod(
+    request,
+    ["POST"],
   );
 
-  if (
-    length > 16384 ||
-    !request.headers
-      .get("content-type")
-      ?.toLowerCase()
-      .startsWith("application/json")
-  ) {
-    return Response.json(
-      { error: "Invalid request." },
-      { status: 400, headers: client.headers }
+  requireCsrfProtection(
+    request,
+  );
+
+  const { client } =
+    await requireUser(
+      request,
+      context,
     );
-  }
+
+  const headers = makeHeaders(
+    client.headers,
+  );
 
   let body: unknown;
 
   try {
-    const raw = await request.text();
-
-    if (raw.length > 16384) {
-      throw new Error("Payload too large");
-    }
-
-    body = JSON.parse(raw);
+    body = await readBody(request);
   } catch {
-    return Response.json(
-      { error: "Invalid JSON payload." },
-      { status: 400, headers: client.headers }
+    return errorResponse(
+      "Invalid JSON request.",
+      400,
+      headers,
     );
   }
 
-  const input =
-    body &&
-    typeof body === "object" &&
-    "links" in body
-      ? (body as { links: unknown }).links
-      : null;
+  const validated =
+    validateBody(body);
 
-  const links = validate(input);
-
-  if (!links) {
-    return Response.json(
-      { error: "Invalid social links." },
-      { status: 400, headers: client.headers }
+  if (!validated) {
+    return errorResponse(
+      "Invalid social links or revision.",
+      400,
+      headers,
     );
   }
 
-  const { error } = await client.supabase.rpc(
-    "save_my_social_links",
-    { p_links: links }
-  );
+  const { data, error } =
+    await client.supabase.rpc(
+      "save_my_social_links_versioned",
+      {
+        p_links: validated.links,
+        p_expected_revision:
+          validated.expectedRevision,
+      },
+    );
 
   if (error) {
+    if (
+      error.code === "P0001" &&
+      error.message.includes(
+        "SOCIAL_LINKS_CONFLICT",
+      )
+    ) {
+      return errorResponse(
+        "SOCIAL_LINKS_CONFLICT",
+        409,
+        headers,
+      );
+    }
+
     console.error(
-      "Social link save failed:",
-      error.code
+      "Versioned social save failed:",
+      error.code,
     );
 
-    return Response.json(
-      { error: "Unable to save social links." },
-      { status: 503, headers: client.headers }
+    if (
+      error.code === "22023"
+    ) {
+      return errorResponse(
+        "Invalid social links.",
+        400,
+        headers,
+      );
+    }
+
+    if (
+      error.code === "42501"
+    ) {
+      return errorResponse(
+        "Access denied.",
+        403,
+        headers,
+      );
+    }
+
+    return errorResponse(
+      "Unable to save social links.",
+      503,
+      headers,
+    );
+  }
+
+  const revision = Number(data);
+
+  if (
+    !Number.isSafeInteger(revision) ||
+    revision < 1
+  ) {
+    return errorResponse(
+      "Invalid save confirmation.",
+      503,
+      headers,
     );
   }
 
   return Response.json(
-    { ok: true },
-    { headers: client.headers }
+    {
+      ok: true,
+      revision,
+    },
+    { headers },
   );
 }

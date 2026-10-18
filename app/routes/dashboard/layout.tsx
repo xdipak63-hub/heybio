@@ -15,7 +15,7 @@ import {
   useLocation,
   useNavigation,
   type LoaderFunctionArgs,
-  type MetaFunction
+  type MetaFunction,
 } from "react-router";
 
 import {
@@ -26,66 +26,93 @@ import {
   Link2,
   Menu,
   Palette,
+  Rocket,
   Settings,
   X,
 } from "lucide-react";
 
 import MobileNavigation from "../../components/creator/MobileNavigation";
-import { requireUser } from "../../lib/auth/require-user.server";
+
+import {
+  requireUser,
+} from "../../lib/auth/require-user.server";
 
 import "./dashboard-shell.css";
 
+/**
+ * HEYBIO Workspace Navigation
+ *
+ * HYPE DROP is a separate product.
+ * This navigation only opens the
+ * HEYBIO membership/launch page.
+ *
+ * It does not issue handoff tokens.
+ */
 const ITEMS = [
   {
     to: "/dashboard",
     label: "Overview",
     icon: LayoutDashboard,
     end: true,
+    hype: false,
   },
   {
     to: "/dashboard/links",
     label: "My Links",
     icon: Link2,
     end: false,
+    hype: false,
   },
   {
     to: "/dashboard/appearance",
     label: "Appearance",
     icon: Palette,
     end: false,
+    hype: false,
   },
   {
     to: "/dashboard/analytics",
     label: "Insights",
     icon: BarChart3,
     end: false,
+    hype: false,
+  },
+  {
+    to: "/dashboard/hype-drop",
+    label: "HYPE DROP",
+    icon: Rocket,
+    end: false,
+    hype: true,
   },
   {
     to: "/dashboard/billing",
     label: "Billing",
     icon: CreditCard,
     end: false,
+    hype: false,
   },
   {
     to: "/dashboard/settings",
     label: "Settings",
     icon: Settings,
     end: false,
+    hype: false,
   },
 ] as const;
 
 export const meta: MetaFunction = () => [
-  { name: "robots", content: "noindex, nofollow" },
+  {
+    name: "robots",
+    content: "noindex, nofollow",
+  },
 ];
 
 export async function loader({
   request,
   context,
 }: LoaderFunctionArgs) {
-  const { user, client } = await requireUser(
-    request,
-    context,
-  );
+  const { user, client } =
+    await requireUser(request, context);
 
   const { data: profile, error } =
     await client.supabase
@@ -109,7 +136,9 @@ export async function loader({
   if (!profile?.username) {
     throw redirect(
       "/onboarding/choose-username",
-      { headers: client.headers },
+      {
+        headers: client.headers,
+      },
     );
   }
 
@@ -123,6 +152,25 @@ export async function loader({
     );
   }
 
+  const headers = new Headers(
+    client.headers,
+  );
+
+  headers.set(
+    "Cache-Control",
+    "private, no-store, max-age=0",
+  );
+
+  headers.set(
+    "X-Robots-Tag",
+    "noindex, nofollow",
+  );
+
+  headers.set(
+    "Vary",
+    "Cookie",
+  );
+
   return data(
     {
       username: profile.username,
@@ -131,33 +179,40 @@ export async function loader({
         profile.username,
       email: user.email ?? "",
     },
-    {
-      headers: new Headers([
-        ...client.headers,
-        ["Cache-Control", "private, no-store"],
-        ["X-Robots-Tag", "noindex, nofollow"],
-      ]),
-    },
+    { headers },
   );
 }
 
 export default function DashboardLayout() {
-  const { username, displayName, email } =
-    useLoaderData<typeof loader>();
+  const {
+    username,
+    displayName,
+    email,
+  } = useLoaderData<typeof loader>();
 
   const navigation = useNavigation();
   const location = useLocation();
 
   const [open, setOpen] = useState(false);
 
+  /**
+   * Close the mobile drawer after
+   * navigation to a different route.
+   */
   useEffect(() => {
     setOpen(false);
   }, [location.pathname]);
 
+  /**
+   * Support Escape key to close
+   * the mobile navigation drawer.
+   */
   useEffect(() => {
     if (!open) return;
 
-    function onKeyDown(event: KeyboardEvent) {
+    function onKeyDown(
+      event: KeyboardEvent,
+    ) {
       if (event.key === "Escape") {
         setOpen(false);
       }
@@ -168,16 +223,20 @@ export default function DashboardLayout() {
       onKeyDown,
     );
 
-    return () =>
+    return () => {
       window.removeEventListener(
         "keydown",
         onKeyDown,
       );
+    };
   }, [open]);
 
   return (
     <div className="hb-dash">
-      <a className="hb-dash__skip" href="#creator-content">
+      <a
+        className="hb-dash__skip"
+        href="#creator-content"
+      >
         Skip to content
       </a>
 
@@ -192,9 +251,12 @@ export default function DashboardLayout() {
 
       <aside
         id="creator-sidebar"
-        className={`hb-dash__sidebar ${
-          open ? "is-open" : ""
-        }`}
+        className={[
+          "hb-dash__sidebar",
+          open ? "is-open" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         aria-label="Creator workspace sidebar"
       >
         <div className="hb-dash__brand-row">
@@ -211,7 +273,10 @@ export default function DashboardLayout() {
             aria-label="Close menu"
             onClick={() => setOpen(false)}
           >
-            <X size={20} />
+            <X
+              size={20}
+              aria-hidden="true"
+            />
           </button>
         </div>
 
@@ -220,12 +285,19 @@ export default function DashboardLayout() {
             className="hb-dash__avatar"
             aria-hidden="true"
           >
-            {displayName.charAt(0).toUpperCase()}
+            {displayName
+              .charAt(0)
+              .toUpperCase()}
           </div>
 
           <div className="hb-dash__account-copy">
-            <strong>{displayName}</strong>
-            <span>@{username}</span>
+            <strong>
+              {displayName}
+            </strong>
+
+            <span>
+              @{username}
+            </span>
           </div>
         </div>
 
@@ -243,17 +315,58 @@ export default function DashboardLayout() {
                 to={item.to}
                 end={item.end}
                 className={({ isActive }) =>
-                  `hb-dash__nav-link ${
-                    isActive ? "is-active" : ""
-                  }`
+                  [
+                    "hb-dash__nav-link",
+                    isActive
+                      ? "is-active"
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")
+                }
+                style={
+                  item.hype
+                    ? {
+                        marginTop: 8,
+                        borderRadius: 14,
+                        background:
+                          "#BDF806",
+                        color:
+                          "#1D1D1F",
+                        fontWeight: 800,
+                      }
+                    : undefined
                 }
               >
                 <Icon
                   size={18}
+                  strokeWidth={1.9}
                   aria-hidden="true"
                 />
 
-                <span>{item.label}</span>
+                <span>
+                  {item.label}
+                </span>
+
+                {item.hype && (
+                  <span
+                    style={{
+                      marginLeft: "auto",
+                      padding:
+                        "3px 7px",
+                      borderRadius: 999,
+                      background:
+                        "#1D1D1F",
+                      color: "#FFFFFF",
+                      fontSize: 9,
+                      fontWeight: 800,
+                      letterSpacing:
+                        ".04em",
+                    }}
+                  >
+                    NEW
+                  </span>
+                )}
               </NavLink>
             );
           })}
@@ -261,19 +374,25 @@ export default function DashboardLayout() {
 
         <div className="hb-dash__sidebar-bottom">
           <a
-            href={`/${encodeURIComponent(username)}`}
+            href={`/${encodeURIComponent(
+              username,
+            )}`}
             target="_blank"
             rel="noopener noreferrer"
             className="hb-dash__public-link"
           >
             View my page
+
             <ExternalLink
               size={16}
               aria-hidden="true"
             />
           </a>
 
-          <Form action="/logout" method="post">
+          <Form
+            action="/logout"
+            method="post"
+          >
             <button
               type="submit"
               className="hb-dash__logout"
@@ -294,12 +413,20 @@ export default function DashboardLayout() {
             aria-controls="creator-sidebar"
             onClick={() => setOpen(true)}
           >
-            <Menu size={22} />
+            <Menu
+              size={22}
+              aria-hidden="true"
+            />
           </button>
 
           <div className="hb-dash__topbar-label">
-            <strong>Your creator space</strong>
-            <span>Make your world yours.</span>
+            <strong>
+              Your creator space
+            </strong>
+
+            <span>
+              Make your world yours.
+            </span>
           </div>
 
           <div className="hb-dash__topbar-actions">
@@ -316,14 +443,22 @@ export default function DashboardLayout() {
         <div
           id="creator-content"
           className="hb-dash__content"
-          aria-busy={navigation.state !== "idle"}
+          aria-busy={
+            navigation.state !==
+            "idle"
+          }
         >
           <Outlet />
         </div>
 
         <footer className="hb-dash__footer">
-          <span>HEYBIO ↗</span>
-          <span>© 2026 DIPO LABS</span>
+          <span>
+            HEYBIO ↗
+          </span>
+
+          <span>
+            © 2026 DIPO LABS
+          </span>
         </footer>
       </div>
 

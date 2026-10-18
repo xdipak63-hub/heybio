@@ -1,44 +1,56 @@
 
 import { NavLink } from "react-router";
+
 import {
   ChartNoAxesColumn,
   LayoutDashboard,
   Link2,
   Palette,
-  Settings
+  Rocket,
 } from "lucide-react";
+
+/**
+ * HEYBIO Creator Mobile Navigation
+ *
+ * Five primary destinations keep the
+ * bottom bar usable on narrow screens.
+ *
+ * HYPE DROP access is verified by its
+ * server-side route loader, not by
+ * the navigation component.
+ */
 
 const items = [
   {
     to: "/dashboard",
     label: "Home",
     icon: LayoutDashboard,
-    end: true
+    end: true,
   },
   {
     to: "/dashboard/links",
     label: "Links",
     icon: Link2,
-    end: false
+    end: false,
   },
   {
     to: "/dashboard/appearance",
     label: "Design",
     icon: Palette,
-    end: false
+    end: false,
   },
   {
     to: "/dashboard/analytics",
     label: "Insights",
     icon: ChartNoAxesColumn,
-    end: false
+    end: false,
   },
   {
-    to: "/dashboard/settings",
-    label: "Settings",
-    icon: Settings,
-    end: false
-  }
+    to: "/dashboard/hype-drop",
+    label: "HYPE DROP",
+    icon: Rocket,
+    end: false,
+  },
 ] as const;
 
 export default function MobileNavigation() {
@@ -55,11 +67,22 @@ export default function MobileNavigation() {
             key={item.to}
             to={item.to}
             end={item.end}
+            aria-label={item.label}
             className={({ isActive }) =>
-              `hb-creator-mobile-nav__item ${isActive ? "is-active" : ""}`
+              [
+                "hb-creator-mobile-nav__item",
+                isActive ? "is-active" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")
             }
           >
-            <Icon size={20} aria-hidden="true" />
+            <Icon
+              size={20}
+              strokeWidth={1.9}
+              aria-hidden="true"
+            />
+
             <span>{item.label}</span>
           </NavLink>
         );

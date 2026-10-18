@@ -1,21 +1,58 @@
+
+/**
+ * HEYBIO by DIPO LABS
+ * Server Security Headers
+ *
+ * Compatible with the existing React Router
+ * application and Razorpay Checkout integration.
+ */
+
 export type SecurityHeaderOptions = {
   privateResponse?: boolean;
   allowIndexing?: boolean;
   contentSecurityPolicy?: string;
 };
 
+/**
+ * Transitional production CSP.
+ *
+ * unsafe-eval is intentionally disabled.
+ * unsafe-inline remains temporarily necessary
+ * until the React Router document and checkout
+ * scripts are migrated to nonce-based CSP.
+ */
 const DEFAULT_CSP = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
-  "form-action 'self'",
+  "form-action 'self' https://api.razorpay.com",
   "img-src 'self' https: data: blob:",
   "font-src 'self' https://fonts.gstatic.com",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-  "connect-src 'self' https:",
-  "upgrade-insecure-requests"
+  [
+    "style-src",
+    "'self'",
+    "'unsafe-inline'",
+    "https://fonts.googleapis.com",
+  ].join(" "),
+  [
+    "script-src",
+    "'self'",
+    "'unsafe-inline'",
+    "https://checkout.razorpay.com",
+  ].join(" "),
+  [
+    "connect-src",
+    "'self'",
+    "https:",
+  ].join(" "),
+  [
+    "frame-src",
+    "'self'",
+    "https://api.razorpay.com",
+    "https://checkout.razorpay.com",
+  ].join(" "),
+  "upgrade-insecure-requests",
 ].join("; ");
 
 export function createSecurityHeaders(
@@ -44,7 +81,7 @@ export function createSecurityHeaders(
       "camera=()",
       "microphone=()",
       "geolocation=()",
-      "payment=()"
+      "payment=()",
     ].join(", ")
   );
 
@@ -59,6 +96,16 @@ export function createSecurityHeaders(
   );
 
   headers.set(
+    "X-Permitted-Cross-Domain-Policies",
+    "none"
+  );
+
+  headers.set(
+    "X-DNS-Prefetch-Control",
+    "off"
+  );
+
+  headers.set(
     "Content-Security-Policy",
     options.contentSecurityPolicy ??
       DEFAULT_CSP
@@ -70,7 +117,10 @@ export function createSecurityHeaders(
       "private, no-store, max-age=0"
     );
 
-    headers.set("Vary", "Cookie");
+    headers.set(
+      "Vary",
+      "Cookie"
+    );
   }
 
   if (options.allowIndexing === false) {
@@ -83,6 +133,10 @@ export function createSecurityHeaders(
   return headers;
 }
 
+/**
+ * Attach security headers to an existing response
+ * without discarding its original headers.
+ */
 export function applySecurityHeaders(
   response: Response,
   options: SecurityHeaderOptions = {}
@@ -103,10 +157,14 @@ export function applySecurityHeaders(
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers
+    headers,
   });
 }
 
+/**
+ * Return a private JSON response.
+ * Suitable for authenticated, non-cacheable APIs.
+ */
 export function createPrivateJsonResponse(
   payload: unknown,
   status = 200
@@ -115,7 +173,7 @@ export function createPrivateJsonResponse(
     status,
     headers: createSecurityHeaders({
       privateResponse: true,
-      allowIndexing: false
-    })
+      allowIndexing: false,
+    }),
   });
 }

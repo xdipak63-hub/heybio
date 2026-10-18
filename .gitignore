@@ -1,45 +1,112 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
-/.pnp
+# ==================================================
+# HEYBIO by DIPO LABS
+# Git ignore rules
+# ==================================================
+
+# Dependencies
+node_modules/
+.pnp/
 .pnp.js
 
-# testing
-/coverage
+# Build outputs
+build/
+dist/
+out/
+.next/
+.react-router/
+.vercel/
+.wrangler/
+.turbo/
+.cache/
+.vite/
 
-# next.js
-/.next/
-/out/
+# Test outputs
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+*.tsbuildinfo
 
-# production
-/build
-/dist
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.*.example
 
-# misc
-.DS_Store
+# Cloudflare local secrets
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+
+# Private credentials
+cft.txt
+**/cft.txt
+*cloudflare*token*.txt
+*razorpay*secret*.txt
+*supabase*secret*.txt
+
+# Credentials and private keys
 *.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.secret
+*.secrets
 
-# debug
+# Local secret directories
+.secrets/
+secrets/
+private/
+credentials/
+
+# Service account files
+*service-account*.json
+*service_account*.json
+*credentials*.json
+
+# Debug logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 .pnpm-debug.log*
 
-# local env files (CRITICAL FOR SECURITY)
-.env
-.env*.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Operating system
+.DS_Store
+Thumbs.db
+Desktop.ini
 
-# vercel
-.vercel
+# Editor local settings
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 
-# cloudflare / wrangler
-.wrangler/
-.dev.vars
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Local database
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Local exports and backups
+backups/
+local-backups/
+*.dump
+*.sql.gz
+
+# Deployment temporary outputs
+.deploy/
+.temp/
+tmp/

@@ -168,6 +168,10 @@ export default [
     "api/social-links",
     "routes/api/social-links.ts",
   ),
+  route(
+  "social-links",
+  "routes/dashboard/social-links.tsx",
+),
   route("api/uploads", "routes/api/uploads.ts"),
   route("api/profile", "routes/api/profile.ts"),
   route("api/links", "routes/api/links.ts"),
@@ -195,6 +199,10 @@ export default [
     "api/hype-entitlement",
     "routes/api/hype-entitlement.ts",
   ),
+  route(
+  "api/hype-launch",
+  "routes/api/hype-launch.ts",
+),
   route(
     "api/admin-actions",
     "routes/api/admin-actions.ts",

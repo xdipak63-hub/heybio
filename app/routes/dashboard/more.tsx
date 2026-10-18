@@ -1,4 +1,3 @@
-
 import { data, Link } from "react-router";
 import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 
@@ -40,6 +39,12 @@ const tools = [
     body: "Add, edit and reorder your destinations.",
     icon: Link2,
   },
+  {
+  to: "/dashboard/social-links",
+  title: "Social links",
+  body: "Connect and manage your social profiles.",
+  icon: Share2,
+},
   {
     to: "/dashboard/appearance",
     title: "Appearance",
