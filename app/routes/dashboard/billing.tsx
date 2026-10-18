@@ -54,7 +54,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
         : null;
 
     const auto = Boolean(activeRecord?.razorpay_subscription_id);
-    const currentMode = auto ? "auto" : "manual";
+    const currentMode: "auto" | "manual" = auto ? "auto" : "manual";
     const scheduledCancellation = Boolean(activeRecord?.cancel_at_period_end);
     const canCancel = Boolean(auto && billing.active && activeRecord?.status === "active" && !scheduledCancellation);
 

@@ -12,9 +12,11 @@ import {
   requireSameOrigin
 } from "../../lib/supabase/server";
 
-export async function loader({
-  request
-}: LoaderFunctionArgs) {
+
+export async function loader(
+  _args: LoaderFunctionArgs
+) {
+
   throw redirect("/login", {
     headers: {
       "Cache-Control": "no-store"

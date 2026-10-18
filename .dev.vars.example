@@ -25,6 +25,9 @@ SUPABASE_URL="https://YOUR_PROJECT_REF.supabase.co"
 # Supabase Project Settings > API Keys
 # Use the public publishable key, not the secret key.
 SUPABASE_PUBLISHABLE_KEY="sb_publishable_REPLACE_ME"
+# Supabase Project Settings > API Keys > Secret keys (default).
+# SERVER ONLY. Never expose this in browser code or commit the real value.
+SUPABASE_SERVICE_ROLE_KEY="sb_secret_REPLACE_ME"
 
 
 # =====================================================

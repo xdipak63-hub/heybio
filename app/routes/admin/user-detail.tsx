@@ -117,7 +117,7 @@ export async function loader({
 
   const email = identity.data.user.email ?? "";
 
-  return Response.json(
+  return data(
     {
       profile: profile.data,
       email,

@@ -61,7 +61,9 @@ export function Dropdown({
     };
   }, [open]);
 
-  function focusItem(index: number) {
+  function focusItem(index: number | undefined) {
+    if (index === undefined) return;
+
     itemRefs.current[index]?.focus();
   }
 

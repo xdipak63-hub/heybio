@@ -1,12 +1,13 @@
 
 import { useState } from "react";
 import {
+  data,
   Form,
   Link,
   useLoaderData,
   useNavigate,
   type LoaderFunctionArgs,
-  type MetaFunction,
+  type MetaFunction
 } from "react-router";
 import { Search, Users } from "lucide-react";
 
@@ -60,7 +61,7 @@ export async function loader({
     !UUID.test(search) &&
     !/^[a-z0-9_]{1,60}$/i.test(search)
   ) {
-    return Response.json(
+    return data(
       {
         users: [],
         page: 1,
@@ -166,7 +167,7 @@ export async function loader({
     createdAt: p.created_at,
   }));
 
-  return Response.json(
+  return data(
     {
       users,
       page,

@@ -137,18 +137,18 @@ export default function SocialLinks({
   }
 
   function addPlatform() {
-    if (
-      disabled ||
-      busy ||
-      items.some((item) => item.platform === selected)
-    ) {
+    const next = available.includes(selected)
+      ? selected
+      : available[0];
+
+    if (disabled || busy || !next) {
       return;
     }
 
     setItems((current) => [
       ...current,
       {
-        platform: selected,
+        platform: next,
         url: "",
         position: current.length,
         is_visible: true
@@ -378,23 +378,7 @@ export default function SocialLinks({
 
             <button
               type="button"
-              onClick={() => {
-                const next = available.includes(selected)
-                  ? selected
-                  : available[0];
-                if (next) {
-                  setItems((current) => [
-                    ...current,
-                    {
-                      platform: next,
-                      url: "",
-                      position: current.length,
-                      is_visible: true
-                    }
-                  ]);
-                  markChanged();
-                }
-              }}
+              onClick={addPlatform}
               disabled={disabled || busy}
               className="hb-creator-button hb-creator-button--secondary"
             >

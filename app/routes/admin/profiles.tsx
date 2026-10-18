@@ -1,10 +1,11 @@
 
 import {
+  data,
   Form,
   Link,
   useLoaderData,
   type LoaderFunctionArgs,
-  type MetaFunction,
+  type MetaFunction
 } from "react-router";
 
 import { ArrowUpRight, Search } from "lucide-react";
@@ -66,7 +67,7 @@ export async function loader({
     .slice(0, 40);
 
   if (q && !/^[a-z0-9_]+$/i.test(q)) {
-    return Response.json(
+    return data(
       {
         profiles: [],
         total: 0,
@@ -112,7 +113,7 @@ export async function loader({
     );
   }
 
-  return Response.json(
+  return data(
     {
       profiles: result.data ?? [],
       total: result.count,

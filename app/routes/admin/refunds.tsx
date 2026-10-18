@@ -1,9 +1,10 @@
 
 import {
+  data,
   Link,
   useLoaderData,
   type LoaderFunctionArgs,
-  type MetaFunction,
+  type MetaFunction
 } from "react-router";
 
 import {
@@ -78,7 +79,7 @@ export async function loader({
     );
   }
 
-  return Response.json(
+  return data(
     {
       refunds: result.data ?? [],
       total: result.count,

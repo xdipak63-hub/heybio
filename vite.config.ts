@@ -7,17 +7,15 @@ export default defineConfig({
   plugins: [
     cloudflare({
       viteEnvironment: {
-        name: "ssr"
-      }
+        name: "server",
+      },
     }),
-    reactRouter()
+    reactRouter(),
   ],
+
   server: {
     host: "127.0.0.1",
     port: 5173,
-    strictPort: true
+    strictPort: true,
   },
-  build: {
-    sourcemap: true
-  }
 });

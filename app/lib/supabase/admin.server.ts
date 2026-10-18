@@ -1,6 +1,7 @@
+
 import {
   createClient,
-  type SupabaseClient
+  type SupabaseClient,
 } from "@supabase/supabase-js";
 
 export interface AdminBindings {
@@ -8,76 +9,131 @@ export interface AdminBindings {
   SUPABASE_SERVICE_ROLE_KEY: string;
 }
 
+export interface ServerBindings
+  extends Record<string, string> {
+  SUPABASE_URL: string;
+  SUPABASE_SERVICE_ROLE_KEY: string;
+  RAZORPAY_KEY_ID: string;
+  RAZORPAY_KEY_SECRET: string;
+  RAZORPAY_WEBHOOK_SECRET: string;
+}
+
 function requireNonEmpty(
-  value: string | undefined,
-  name: string
+  value: unknown,
+  name: string,
 ): string {
-  if (!value?.trim()) {
+  if (
+    typeof value !== "string" ||
+    !value.trim()
+  ) {
     throw new Error(
-      `Missing server environment binding: ${name}`
+      `Missing or invalid server binding: ${name}`,
     );
   }
 
   return value;
 }
 
-export function createSupabaseAdmin(
-  env: AdminBindings
-): SupabaseClient {
-  const url = requireNonEmpty(
-    env.SUPABASE_URL,
-    "SUPABASE_URL"
-  );
-
-  const serviceKey = requireNonEmpty(
-    env.SUPABASE_SERVICE_ROLE_KEY,
-    "SUPABASE_SERVICE_ROLE_KEY"
-  );
-
-  return createClient(
-    url,
-    serviceKey,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-        detectSessionInUrl: false
-      },
-      global: {
-        headers: {
-          "X-Client-Info": "heybio-worker"
-        }
-      }
-    }
-  );
-}
-
 export function getServerBindings(
-  context: unknown
-): Record<string, string> {
+  context: unknown,
+): ServerBindings {
   if (
     !context ||
     typeof context !== "object" ||
     !("cloudflare" in context)
   ) {
     throw new Error(
-      "Cloudflare context is unavailable."
+      "Cloudflare context is unavailable.",
     );
   }
 
   const cloudflare = (
     context as {
       cloudflare?: {
-        env?: Record<string, string>;
+        env?: unknown;
       };
     }
   ).cloudflare;
 
-  if (!cloudflare?.env) {
+  const rawEnv = cloudflare?.env;
+
+  if (
+    !rawEnv ||
+    typeof rawEnv !== "object" ||
+    Array.isArray(rawEnv)
+  ) {
     throw new Error(
-      "Cloudflare environment bindings are unavailable."
+      "Cloudflare environment bindings are unavailable.",
     );
   }
 
-  return cloudflare.env;
+  const env = rawEnv as Record<
+    string,
+    unknown
+  >;
+
+  const bindings: Record<
+    string,
+    string
+  > = {};
+
+  for (const [key, value] of Object.entries(env)) {
+    if (typeof value === "string") {
+      bindings[key] = value;
+    }
+  }
+
+  bindings.SUPABASE_URL =
+    requireNonEmpty(
+      env.SUPABASE_URL,
+      "SUPABASE_URL",
+    );
+
+  bindings.SUPABASE_SERVICE_ROLE_KEY =
+    requireNonEmpty(
+      env.SUPABASE_SERVICE_ROLE_KEY,
+      "SUPABASE_SERVICE_ROLE_KEY",
+    );
+
+  return bindings as ServerBindings;
+}
+
+export function createSupabaseAdmin(
+  env: AdminBindings,
+): SupabaseClient {
+  const url = requireNonEmpty(
+    env.SUPABASE_URL,
+    "SUPABASE_URL",
+  );
+
+  const serviceKey = requireNonEmpty(
+    env.SUPABASE_SERVICE_ROLE_KEY,
+    "SUPABASE_SERVICE_ROLE_KEY",
+  );
+
+  const parsedUrl = new URL(url);
+
+  if (parsedUrl.protocol !== "https:") {
+    throw new Error(
+      "Supabase URL must use HTTPS.",
+    );
+  }
+
+  return createClient(
+    parsedUrl.toString(),
+    serviceKey,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false,
+      },
+      global: {
+        headers: {
+          "X-Client-Info":
+            "heybio-worker",
+        },
+      },
+    },
+  );
 }

@@ -5,6 +5,7 @@ import {
 } from "react";
 
 import {
+  data,
   Form,
   Link,
   NavLink,
@@ -14,7 +15,7 @@ import {
   useLocation,
   useNavigation,
   type LoaderFunctionArgs,
-  type MetaFunction,
+  type MetaFunction
 } from "react-router";
 
 import {
@@ -122,7 +123,7 @@ export async function loader({
     );
   }
 
-  return Response.json(
+  return data(
     {
       username: profile.username,
       displayName:

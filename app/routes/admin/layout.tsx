@@ -2,6 +2,7 @@
 import { useState } from "react";
 
 import {
+  data,
   Outlet,
   useLoaderData,
   useNavigation,
@@ -37,7 +38,7 @@ export async function loader({
     "dashboard.read"
   );
 
-  return Response.json(
+  return data(
     {
       admin: {
         id: admin.user.id,

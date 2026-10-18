@@ -3,6 +3,6 @@ import type { Config } from "@react-router/dev/config";
 
 export default {
   appDirectory: "app",
-  buildDirectory: "build",
-  ssr: true
+  buildDirectory: "dist",
+  ssr: true,
 } satisfies Config;

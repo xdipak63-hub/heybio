@@ -41,7 +41,7 @@ export async function requireMfa(
 
   return {
     currentLevel: "aal2",
-    nextLevel: data.nextLevel,
+        nextLevel: data.nextLevel === "aal1" ? "aal1" : "aal2",
     verified: true
   };
 }

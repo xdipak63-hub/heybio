@@ -75,6 +75,7 @@ export function Tabs({
     event.preventDefault();
 
     const next = enabled[nextIndex];
+    if (!next) return;
     onChange(next.id);
     refs.current[next.position]?.focus();
   }

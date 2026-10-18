@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 import {
+  data,
   type LoaderFunctionArgs
 } from "react-router";
 
@@ -38,7 +39,7 @@ export async function loader({
     "dashboard.read"
   );
 
-  return Response.json(
+  return data(
     {
       verified: true
     },

@@ -1,7 +1,8 @@
 import {
   createServerClient,
   parseCookieHeader,
-  serializeCookieHeader
+  serializeCookieHeader,
+  type CookieOptions
 } from "@supabase/ssr";
 
 type SupabaseBindings = {
@@ -47,7 +48,15 @@ export function createSupabaseServer(
           );
         },
 
-        setAll(cookiesToSet, cacheHeaders) {
+        setAll(
+          cookiesToSet: {
+            name: string;
+            value: string;
+            options: CookieOptions;
+          }[],
+          // Only provided by newer @supabase/ssr versions.
+          cacheHeaders?: Record<string, string>
+        ) {
           for (const cookie of cookiesToSet) {
             headers.append(
               "Set-Cookie",

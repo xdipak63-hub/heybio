@@ -1,10 +1,11 @@
 
 import {
+  data,
   Form,
   Link,
   useLoaderData,
   type LoaderFunctionArgs,
-  type MetaFunction,
+  type MetaFunction
 } from "react-router";
 
 import { Wallet } from "lucide-react";
@@ -104,7 +105,7 @@ export async function loader({
     });
   }
 
-  return Response.json(
+  return data(
     {
       payments: result.data ?? [],
       page,

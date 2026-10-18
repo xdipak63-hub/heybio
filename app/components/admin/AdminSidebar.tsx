@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from "react";
-import { Link, NavLink } from "react-router";
+import { NavLink } from "react-router";
 import Logo from "../shared/Logo";
 import {
   Activity,

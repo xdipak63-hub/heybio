@@ -1,8 +1,9 @@
 
 import {
+  data,
   useLoaderData,
   type LoaderFunctionArgs,
-  type MetaFunction,
+  type MetaFunction
 } from "react-router";
 
 import {
@@ -209,7 +210,7 @@ export async function loader({
     gross += value.gross;
     refunds += value.refunds;
 
-    const [year, month] =
+    const [year = 1970, month = 1] =
       key.split("-").map(Number);
 
     return {
@@ -233,7 +234,7 @@ export async function loader({
     };
   });
 
-  return Response.json(
+  return data(
     {
       points,
       gross,

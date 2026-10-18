@@ -1,9 +1,10 @@
 
 import {
+  data,
   Link,
   useLoaderData,
   type LoaderFunctionArgs,
-  type MetaFunction,
+  type MetaFunction
 } from "react-router";
 
 import {
@@ -133,7 +134,7 @@ export async function loader({
       valid.has(subscription.id),
   }));
 
-  return Response.json(
+  return data(
     {
       rows,
       total: subscriptions.count,

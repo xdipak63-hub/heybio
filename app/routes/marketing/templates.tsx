@@ -17,7 +17,7 @@ const showcase = showcaseIds.map((id) => {
 });
 
 export default function TemplatesPage() {
-  const [selectedId, setSelectedId] = useState<(typeof showcaseIds)[number]>("classic");
+  const [selectedId, setSelectedId] = useState<(typeof THEME_PRESETS)[number]["id"]>("classic");
   const selected = showcase.find((theme) => theme.id === selectedId) ?? showcase[0]!;
   const isDark = selected.id === "midnight";
 

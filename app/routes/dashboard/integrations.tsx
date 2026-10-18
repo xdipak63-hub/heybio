@@ -98,9 +98,9 @@ export default function DashboardIntegrations() {
       }),
     });
 
-    const body: { ok?: boolean } = await response
+    const body = (await response
       .json()
-      .catch(() => ({}));
+      .catch(() => ({}))) as { ok?: boolean };
 
     if (!response.ok || !body.ok) {
       throw new Error("Social links could not be saved.");

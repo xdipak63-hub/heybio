@@ -1,9 +1,10 @@
 
 import {
+  data,
   Link,
   useLoaderData,
   type LoaderFunctionArgs,
-  type MetaFunction,
+  type MetaFunction
 } from "react-router";
 
 import {
@@ -67,7 +68,7 @@ export async function loader({
     );
   }
 
-  return Response.json(
+  return data(
     {
       currentAdminId: admin.user.id,
 

@@ -60,7 +60,7 @@ export default function LegalLayout({ kind, eyebrow, title, subtitle, summary, h
   }, [sections]);
 
   const position = LEGAL_LINKS.findIndex((page) => page.kind === kind);
-  const next = LEGAL_LINKS[(position + 1) % LEGAL_LINKS.length];
+  const next = LEGAL_LINKS[(position + 1) % LEGAL_LINKS.length] ?? LEGAL_LINKS[0];
 
   return (
     <div className="hb-legal">
