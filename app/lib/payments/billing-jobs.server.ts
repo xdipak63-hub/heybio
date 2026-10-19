@@ -82,6 +82,12 @@ export async function runBillingJobs(
     }
   }
 
+  // Free the single open-order slot of users who never completed checkout.
+  const { error: expiryError } = await db.rpc("expire_stale_manual_orders");
+  if (expiryError) {
+    console.warn("Stale manual order cleanup failed", expiryError.code);
+  }
+
   if (summary.failed > 0) {
     console.warn(
       "Billing jobs completed with failed events",

@@ -90,3 +90,27 @@ export async function reconcileProviderPayment(
   }
   return "unrelated";
 }
+
+
+/** Reads the refund state from Razorpay and applies it. Webhook JSON is never trusted for amounts. */
+export async function reconcileProviderRefund(
+  db: SupabaseClient, env: RazorpayBindings, paymentId: string
+): Promise<boolean> {
+  if (!PAY.test(paymentId)) throw new Error("Invalid payment reference");
+  const payment: RazorpayPayment = await createRazorpayClient(env).getPayment(paymentId);
+  if (payment.id !== paymentId || payment.entity !== "payment" || payment.currency !== "INR" ||
+      !Number.isSafeInteger(payment.amount) || payment.amount <= 0) {
+    throw new Error("Invalid payment from provider");
+  }
+  const refunded = payment.amount_refunded ?? 0;
+  if (!Number.isSafeInteger(refunded) || refunded < 0 || refunded > payment.amount) {
+    throw new Error("Invalid refund amount from provider");
+  }
+  if (refunded === 0) return false;
+  const status = payment.status === "refunded" ? "refunded" : "captured";
+  const { data, error } = await db.rpc("apply_verified_refund", {
+    p_payment_id: payment.id, p_amount_refunded_paise: refunded, p_provider_status: status
+  });
+  if (error) throw new Error(`Refund settlement failed: ${error.code}`);
+  return (data as { applied?: boolean } | null)?.applied === true;
+}

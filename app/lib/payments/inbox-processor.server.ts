@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { RazorpayBindings } from "./razorpay.server";
 import { extractSubscriptionId } from "./settlement-types";
-import { reconcileProviderPayment, reconcileProviderSubscription } from "./verified-settlement.server";
+import { reconcileProviderPayment, reconcileProviderRefund, reconcileProviderSubscription } from "./verified-settlement.server";
 
 interface ClaimedEvent {
   id: string;
@@ -17,6 +17,15 @@ function paymentIdFromEvent(payload: unknown): string | null {
   if (!payload || typeof payload !== "object") return null;
   const envelope = (payload as { payload?: { payment?: { entity?: { id?: unknown } } } }).payload;
   const id = envelope?.payment?.entity?.id;
+  return typeof id === "string" && /^pay_[A-Za-z0-9]+$/.test(id) ? id : null;
+}
+
+function refundPaymentIdFromEvent(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") return null;
+  const envelope = (payload as {
+    payload?: { refund?: { entity?: { payment_id?: unknown } } };
+  }).payload;
+  const id = envelope?.refund?.entity?.payment_id ?? paymentIdFromEvent(payload);
   return typeof id === "string" && /^pay_[A-Za-z0-9]+$/.test(id) ? id : null;
 }
 
@@ -47,6 +56,10 @@ export async function processBillingInbox(
         }
         if (paymentId) await reconcileProviderPayment(db, env, paymentId);
         // Unrelated merchant events do not belong to a HEYBIO order and are ignored.
+      }
+      if (event.event_type === "refund.processed" || event.event_type === "refund.created") {
+        const refundedPaymentId = refundPaymentIdFromEvent(event.payload);
+        if (refundedPaymentId) await reconcileProviderRefund(db, env, refundedPaymentId);
       }
       success = true;
     } catch (err) {

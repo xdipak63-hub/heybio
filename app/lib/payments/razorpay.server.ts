@@ -29,6 +29,7 @@ export interface RazorpayPayment {
   captured: boolean;
   created_at: number;
   method?: string | null;
+  amount_refunded?: number;
 }
 
 export interface RazorpayPlan {

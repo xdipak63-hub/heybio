@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     cloudflare({
   viteEnvironment: {
-    name: "server",
+    name: "ssr",
   },
 }),
     reactRouter(),
